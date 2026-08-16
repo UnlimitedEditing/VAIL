@@ -6,6 +6,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Factories/MaterialFactoryNew.h"
 #include "Factories/MaterialInstanceConstantFactoryNew.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"

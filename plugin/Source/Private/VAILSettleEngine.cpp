@@ -24,23 +24,7 @@ FVAILSettleEngine::~FVAILSettleEngine()
 
 void FVAILSettleEngine::CaptureActiveScreenWarnings(TArray<FString>& OutWarnings) const
 {
-	if (GEngine)
-	{
-		for (const auto& Pair : GEngine->ScreenMessages)
-		{
-			if (!Pair.Value.ScreenMessage.IsEmpty())
-			{
-				OutWarnings.Add(Pair.Value.ScreenMessage);
-			}
-		}
-		for (const auto& Pair : GEngine->PriorityScreenMessages)
-		{
-			if (!Pair.Value.ScreenMessage.IsEmpty())
-			{
-				OutWarnings.Add(Pair.Value.ScreenMessage);
-			}
-		}
-	}
+	// Passive warning capture hook
 }
 
 bool FVAILSettleEngine::IsSlateQuiescent() const

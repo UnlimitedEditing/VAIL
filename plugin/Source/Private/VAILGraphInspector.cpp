@@ -375,7 +375,7 @@ bool FVAILGraphInspector::SpawnNode(
 
 		if (Material->MaterialGraph)
 		{
-			Material->MaterialGraph->AddExpression(NewExpr);
+			Material->MaterialGraph->AddExpression(NewExpr, false);
 			Material->MaterialGraph->RebuildGraph();
 		}
 

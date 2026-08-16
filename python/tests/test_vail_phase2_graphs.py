@@ -1,13 +1,14 @@
-"""
-VAIL Phase 2 Verification Suite: Universal Graph Data-Channel & Asset Management
-Tests headless asset creation, graph inspection, polymorphic node spawning, and pin wiring.
-"""
-
 import sys
 import os
 import json
 import logging
 from pathlib import Path
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 _ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_ROOT))
