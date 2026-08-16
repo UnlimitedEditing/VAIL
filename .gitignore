@@ -1,0 +1,25 @@
+# Unreal Engine
+Intermediate/
+Binaries/
+Saved/
+DerivedDataCache/
+*.VC.db
+*.opendb
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# IDE / OS
+.vscode/
+.idea/
+.vs/
+Thumbs.db
+Desktop.ini
+*.log
