@@ -1,0 +1,18 @@
+{
+  "name": "vail_get_tree",
+  "description": "Get the pruned, compact semantic hierarchy of interactable properties/widgets in the active scope.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "max_depth": {
+        "type": "number",
+        "description": "Maximum property nesting depth (default: 2)"
+      },
+      "category_filter": {
+        "type": "string",
+        "description": "Optional substring filter for category names (e.g. 'Transform', 'Physics')"
+      }
+    },
+    "required": []
+  }
+}

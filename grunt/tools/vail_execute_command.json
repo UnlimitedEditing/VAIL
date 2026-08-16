@@ -1,0 +1,16 @@
+{
+  "name": "vail_execute_command",
+  "description": "Execute a human-facing editor command by its stable FUICommandInfo semantic ID.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "command_id": {
+        "type": "string",
+        "description": "The semantic identifier (e.g. 'Kismet.Compile', 'LevelEditor.SaveDirect', 'MainFrame.SaveAll')"
+      }
+    },
+    "required": [
+      "command_id"
+    ]
+  }
+}

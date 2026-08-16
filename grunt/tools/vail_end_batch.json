@@ -1,0 +1,9 @@
+{
+  "name": "vail_end_batch",
+  "description": "Commit and close the active compound transaction batch.",
+  "parameters": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  }
+}

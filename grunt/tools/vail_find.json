@@ -1,0 +1,20 @@
+{
+  "name": "vail_find",
+  "description": "Fuzzy-search for editor commands, properties, or tooltips by human label or identifier.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search query (e.g. 'Compile', 'Location', 'Simulate Physics', 'Save')"
+      },
+      "scope": {
+        "type": "string",
+        "description": "Optional scope restriction (e.g. 'Toolbar', 'DetailsPanel')"
+      }
+    },
+    "required": [
+      "query"
+    ]
+  }
+}

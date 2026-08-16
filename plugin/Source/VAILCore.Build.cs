@@ -45,7 +45,9 @@ public class VAILCore : ModuleRules
 				"KismetCompiler",
 				"BlueprintGraph",
 				"Projects",
-				"AssetRegistry"
+				"AssetRegistry",
+				"AssetTools",
+				"MaterialEditor"
 			}
 		);
 	}

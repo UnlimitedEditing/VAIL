@@ -1,0 +1,21 @@
+{
+  "name": "vail_set_property",
+  "description": "Set a property value on the active scoped object using human-formatted strings.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "property_id": {
+        "type": "string",
+        "description": "Dot-separated property path (e.g. 'RelativeLocation.X', 'Mobility', 'bHidden')"
+      },
+      "value": {
+        "type": "string",
+        "description": "Formatted new value (e.g. '500.0', 'Movable', 'true')"
+      }
+    },
+    "required": [
+      "property_id",
+      "value"
+    ]
+  }
+}

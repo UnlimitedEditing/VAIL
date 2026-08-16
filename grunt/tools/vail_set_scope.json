@@ -1,0 +1,20 @@
+{
+  "name": "vail_set_scope",
+  "description": "Set the active agent attention scope in Unreal Editor.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "scope": {
+        "type": "string",
+        "description": "Target panel or context ('DetailsPanel', 'Toolbar', 'ContentBrowser', 'ActivePanel')"
+      },
+      "target": {
+        "type": "string",
+        "description": "Optional target actor label/name, asset package path (e.g. '/Game/Blueprints/BP_Player')"
+      }
+    },
+    "required": [
+      "scope"
+    ]
+  }
+}

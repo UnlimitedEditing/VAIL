@@ -1,0 +1,14 @@
+{
+  "name": "vail_wait_for",
+  "description": "Block until the editor UI, Slate layout passes, and background compilation pipelines settle.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "timeout_seconds": {
+        "type": "number",
+        "description": "Maximum wait duration before returning timeout error (default: 5.0)"
+      }
+    },
+    "required": []
+  }
+}

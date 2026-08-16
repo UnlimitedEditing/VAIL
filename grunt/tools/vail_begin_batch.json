@@ -1,0 +1,14 @@
+{
+  "name": "vail_begin_batch",
+  "description": "Begin a compound transaction batch so subsequent operations group into a single Undo step.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "Human-readable description for Edit -> Undo History"
+      }
+    },
+    "required": []
+  }
+}
