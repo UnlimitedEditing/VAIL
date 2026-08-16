@@ -104,12 +104,18 @@ void FVAILPropertyInspector::TraverseNode(
 		PropNode.bIsEditable = Handle->IsEditable();
 		PropNode.bDiffersFromDefault = Handle->DiffersFromDefault();
 
-		TArray<FString> OptionStrings;
+		TArray<TSharedPtr<FString>> OptionStrings;
 		TArray<FText> Tooltips;
 		TArray<bool> Restricted;
 		if (Handle->GeneratePossibleValues(OptionStrings, Tooltips, Restricted) && OptionStrings.Num() > 0)
 		{
-			PropNode.Options = OptionStrings;
+			for (const TSharedPtr<FString>& Option : OptionStrings)
+			{
+				if (Option.IsValid())
+				{
+					PropNode.Options.Add(*Option);
+				}
+			}
 		}
 
 		TArray<TSharedRef<IDetailTreeNode>> Children;

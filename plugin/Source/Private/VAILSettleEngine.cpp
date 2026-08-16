@@ -41,11 +41,6 @@ bool FVAILSettleEngine::IsSlateQuiescent() const
 
 bool FVAILSettleEngine::IsAsyncSettled(UBlueprint* ScopedBlueprint) const
 {
-	if (GEditor && GEditor->IsCompiling())
-	{
-		return false;
-	}
-
 	if (FAssetCompilingManager::Get().GetNumRemainingAssets() > 0)
 	{
 		return false;
