@@ -13,12 +13,16 @@ struct FVAILSettleResult
 	float SettleDurationMs;
 	int32 QuiescentFrames;
 	FString SettleFailureReason;
+	TArray<FString> ScreenWarnings;
 };
 
 class VAILCORE_API FVAILSettleEngine
 {
 public:
 	static FVAILSettleEngine& Get();
+
+	/** Captures active on-screen viewport messages and warnings from GEngine */
+	void CaptureActiveScreenWarnings(TArray<FString>& OutWarnings) const;
 
 	/** Checks Tier 1: Slate layout and attribute invalidation status */
 	bool IsSlateQuiescent() const;

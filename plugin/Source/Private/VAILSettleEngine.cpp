@@ -6,6 +6,8 @@
 #include "Engine/Blueprint.h"
 #include "HAL/PlatformTime.h"
 
+#include "Engine/Engine.h"
+
 FVAILSettleEngine& FVAILSettleEngine::Get()
 {
 	static FVAILSettleEngine Singleton;
@@ -18,6 +20,27 @@ FVAILSettleEngine::FVAILSettleEngine()
 
 FVAILSettleEngine::~FVAILSettleEngine()
 {
+}
+
+void FVAILSettleEngine::CaptureActiveScreenWarnings(TArray<FString>& OutWarnings) const
+{
+	if (GEngine)
+	{
+		for (const auto& Pair : GEngine->ScreenMessages)
+		{
+			if (!Pair.Value.ScreenMessage.IsEmpty())
+			{
+				OutWarnings.Add(Pair.Value.ScreenMessage);
+			}
+		}
+		for (const auto& Pair : GEngine->PriorityScreenMessages)
+		{
+			if (!Pair.Value.ScreenMessage.IsEmpty())
+			{
+				OutWarnings.Add(Pair.Value.ScreenMessage);
+			}
+		}
+	}
 }
 
 bool FVAILSettleEngine::IsSlateQuiescent() const
@@ -108,6 +131,7 @@ FVAILSettleResult FVAILSettleEngine::WaitForSettle(
 			{
 				Result.bSettled = true;
 				Result.SettleDurationMs = static_cast<float>((FPlatformTime::Seconds() - StartTime) * 1000.0);
+				CaptureActiveScreenWarnings(Result.ScreenWarnings);
 				return Result;
 			}
 		}
@@ -120,6 +144,7 @@ FVAILSettleResult FVAILSettleEngine::WaitForSettle(
 	}
 
 	Result.SettleDurationMs = static_cast<float>((FPlatformTime::Seconds() - StartTime) * 1000.0);
+	CaptureActiveScreenWarnings(Result.ScreenWarnings);
 	
 	if (!IsSlateQuiescent())
 	{

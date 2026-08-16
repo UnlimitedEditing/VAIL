@@ -32,7 +32,10 @@ Every request and response over the TCP socket is a single-line JSON string foll
       { "id": "RelativeLocation.X", "old": "0.000", "new": "500.000" }
     ]
   },
-  "settle_ms": 16.4
+  "settle_ms": 16.4,
+  "screen_warnings": [
+    "Cached lighting in Lumen... is going to be clipped. Exposure: -8.5."
+  ]
 }
 ```
 
