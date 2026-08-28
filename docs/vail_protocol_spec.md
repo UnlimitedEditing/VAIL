@@ -266,98 +266,117 @@ Groups multiple tool calls into a single named human undo step.
 
 ---
 
-## 3. Python FastMCP Tool Bindings (`vail_tools.py`)
+## 3. Phase 2: Universal Graph & Asset Primitives
 
-```python
-"""
-VAIL (Virtual Agent Interface Layer) FastMCP Tool Registration.
-Exposes universal, human-semantic UI & data interaction primitives to agents.
-"""
+### 8. `vail_graph_get_topology`
+Returns the node-and-pin connectivity graph of an asset (Blueprint, Material).
+- **Request:**
+  ```json
+  {
+    "type": "vail_graph_get_topology",
+    "params": {
+      "asset_path": "/Game/Materials/M_HeroShader",
+      "graph_name": ""
+    }
+  }
+  ```
 
-from typing import Optional, Dict, Any
-from unreal_mcp_server import get_unreal_connection
+### 9. `vail_graph_add_node`
+Spawns a node in an asset graph (K2Node, MaterialExpression).
+- **Request:**
+  ```json
+  {
+    "type": "vail_graph_add_node",
+    "params": {
+      "node_type": "CallFunction:PrintString",
+      "asset_path": "/Game/Blueprints/BP_Player",
+      "graph_name": "EventGraph",
+      "pos_x": 400.0,
+      "pos_y": 0.0
+    }
+  }
+  ```
 
-def register_vail_tools(mcp):
-    """Register all universal VAIL primitives on the FastMCP server."""
+### 10. `vail_graph_connect_pins` & `vail_graph_delete_node`
+Connects two pins with schema validation or deletes a node by GUID.
 
-    @mcp.tool()
-    def vail_set_scope(scope: str, target: str = "") -> Dict[str, Any]:
-        """Set the active agent attention scope in Unreal Editor.
-        
-        Args:
-            scope: Target panel or context (e.g. 'DetailsPanel', 'Toolbar', 'ContentBrowser').
-            target: Optional target actor name, asset path, or object identifier.
-        """
-        conn = get_unreal_connection()
-        return conn.send_command("vail_set_scope", {"scope": scope, "target": target})
+### 11. `vail_asset_create`, `vail_asset_query`, `vail_asset_save`
+Headless Content Browser asset lifecycle tools.
 
-    @mcp.tool()
-    def vail_get_tree(max_depth: int = 2, category_filter: str = "") -> Dict[str, Any]:
-        """Get the pruned, compact semantic hierarchy of interactable properties/widgets in active scope.
-        
-        Args:
-            max_depth: Maximum property nesting depth (default: 2).
-            category_filter: Optional substring filter for category names (e.g. 'Transform').
-        """
-        conn = get_unreal_connection()
-        return conn.send_command("vail_get_tree", {"max_depth": max_depth, "category_filter": category_filter})
+---
 
-    @mcp.tool()
-    def vail_find(query: str, scope: str = "") -> Dict[str, Any]:
-        """Fuzzy-search for editor commands, properties, or tooltips by human label.
-        
-        Args:
-            query: Search query (e.g. 'Compile', 'Location', 'Simulate Physics').
-            scope: Optional scope restriction (e.g. 'Toolbar', 'DetailsPanel').
-        """
-        conn = get_unreal_connection()
-        return conn.send_command("vail_find", {"query": query, "scope": scope})
+## 4. Phase 3: Spatial, UMG, Sequencer & Sensory Vectors
 
-    @mcp.tool()
-    def vail_execute_command(command_id: str) -> Dict[str, Any]:
-        """Execute a human-facing editor command by its stable FUICommandInfo semantic ID.
-        
-        Args:
-            command_id: The semantic identifier (e.g. 'Kismet.Compile', 'LevelEditor.Save').
-        """
-        conn = get_unreal_connection()
-        return conn.send_command("vail_execute_command", {"command_id": command_id})
+### 12. Level & Viewport Spatial Manipulation
+- **`vail_level_spawn_actor`**: Places an asset or actor into the active level viewport.
+  ```json
+  {
+    "type": "vail_level_spawn_actor",
+    "params": {
+      "asset_path": "/Game/Meshes/SM_Pillar",
+      "actor_label": "Pillar_Entrance_01",
+      "location": [500.0, 200.0, 0.0],
+      "rotation": [0.0, 90.0, 0.0],
+      "scale": [1.0, 1.0, 1.0],
+      "folder_path": "Architecture/Exterior"
+    }
+  }
+  ```
+- **`vail_level_query_actors`**: Queries actors by wildcard pattern, class, or tags.
+- **`vail_level_delete_actor`**: Deletes an actor in an undoable transaction.
+- **`vail_viewport_frame`**: Focuses/frames the viewport camera smoothly onto an actor or point without stealing OS mouse/window focus.
 
-    @mcp.tool()
-    def vail_set_property(property_id: str, value: str) -> Dict[str, Any]:
-        """Set a property value on the active scoped object using human-formatted strings.
-        
-        Args:
-            property_id: Dot-separated property path (e.g. 'RelativeLocation.X', 'Mobility').
-            value: Formatted new value (e.g. '500.0', 'Movable', 'true').
-        """
-        conn = get_unreal_connection()
-        return conn.send_command("vail_set_property", {"property_id": property_id, "value": value})
+### 13. UMG Widget Tree & UI Canvas Channel
+- **`vail_widget_tree_get`**: Inspects the widget tree hierarchy of a Widget Blueprint.
+- **`vail_widget_add_element`**: Adds CanvasPanel, Button, TextBlock, Image, etc. with slot layout and content presets.
+- **`vail_widget_set_slot`**: Mutates anchors, positions, sizes, alignments, and padding.
+- **`vail_widget_bind_event`**: Binds delegate events (`OnClicked`, `OnHovered`) into the graph.
 
-    @mcp.tool()
-    def vail_wait_for(condition: str = "quiescent", timeout_seconds: float = 5.0) -> Dict[str, Any]:
-        """Block until the editor UI and background asset/compilation pipelines settle.
-        
-        Args:
-            condition: Condition to wait for ('quiescent', 'compilation_complete', 'modal_cleared').
-            timeout_seconds: Maximum wait duration before returning timeout error.
-        """
-        conn = get_unreal_connection()
-        return conn.send_command("vail_wait_for", {"condition": condition, "timeout_seconds": timeout_seconds})
+### 14. Sequencer & Cine Timeline Channel
+- **`vail_sequencer_query`**: Queries tracks, bindings, and sections of a LevelSequence.
+- **`vail_sequencer_add_track`**: Adds Transform, Property, Audio, CameraCut tracks.
+- **`vail_sequencer_add_key`**: Inserts keyframes on track channels with interpolation curves.
 
-    @mcp.tool()
-    def vail_begin_batch(title: str) -> Dict[str, Any]:
-        """Begin a compound transaction batch so subsequent operations group into a single Undo step.
-        
-        Args:
-            title: Human-readable description for Edit -> Undo History.
-        """
-        conn = get_unreal_connection()
-        return conn.send_command("vail_begin_batch", {"title": title})
+### 15. Sensory Telemetry Vectors (The 4 Diagnostic Vectors)
+- **`vail_sense_optical`**: Returns compact optical telemetry (dominant RGB, hue, saturation, luminance lux, exposure, clipping %).
+- **`vail_sense_spatial`**: Returns spatial clearance, surface normal, collision overlap depth, and camera frustum visibility.
+- **`vail_sense_mesh`**: Returns geometric health, triangle count, Nanite status, UV overlap %.
+- **`vail_sense_shader`**: Returns shader complexity, instruction count, texture samplers, roughness, and Lumen cache validity.
 
-    @mcp.tool()
-    def vail_end_batch() -> Dict[str, Any]:
-        """Commit and close the active compound transaction batch."""
-        conn = get_unreal_connection()
-        return conn.send_command("vail_end_batch", {})
-```
+---
+
+## 5. Phase 4: Subsystems & Specialized Production Tooling
+
+### 16. Landscape & Terrain
+- **`vail_landscape_create`**: Creates landscape grid terrain headlessly.
+  ```json
+  {
+    "type": "vail_landscape_create",
+    "params": {
+      "section_size": 63,
+      "sections_per_component": 1,
+      "component_count_x": 8,
+      "component_count_y": 8,
+      "material_path": "/Game/Materials/M_LandscapeMaster"
+    }
+  }
+  ```
+- **`vail_landscape_sculpt`**: Applies heightmap sculpting brushes (`Sculpt`, `Smooth`, `Flatten`, `Ramp`, `Erosion`).
+- **`vail_landscape_paint`**: Paints weightmap layers (`Grass`, `Rock`, `Snow`).
+
+### 17. Foliage & Instancing
+- **`vail_foliage_scatter`**: Procedurally scatters instanced meshes within radius with scale and normal alignment.
+- **`vail_foliage_query`**: Queries foliage instance counts and species in bounding volumes.
+
+### 18. Control Rig & Solvers
+- **`vail_control_rig_set_transform`**: Mutates Control Rig bone and control solver target goals.
+- **`vail_control_rig_query`**: Inspects available rig controls, bones, and limits.
+
+### 19. MetaSounds & Audio
+- **`vail_audio_play`**: Auditions SoundCue or MetaSound assets in 2D or 3D space.
+- **`vail_audio_set_parameter`**: Sets runtime parameters on active MetaSound graphs (`PitchMod`, `ReverbGain`, `TriggerPlay`).
+
+### 20. Project Build & Automation
+- **`vail_project_build`**: Triggers cook, package, or build pipelines for target platforms (`Windows`, `Linux`, `Android`).
+
+

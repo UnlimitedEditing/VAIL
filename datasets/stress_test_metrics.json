@@ -1,0 +1,678 @@
+{
+  "summary": {
+    "total_calls": 72,
+    "successful": 45,
+    "failed": 27,
+    "wall_clock_s": 30.188,
+    "total_wire_bytes": 20248,
+    "vail_tokens": 5062,
+    "traditional_tokens": 928860,
+    "unique_tools": [
+      "vail_asset_save",
+      "vail_sense_shader",
+      "vail_set_scope",
+      "vail_begin_batch",
+      "spawn_actor",
+      "vail_viewport_frame",
+      "vail_sense_optical",
+      "vail_end_batch",
+      "vail_graph_get_topology",
+      "vail_sense_mesh",
+      "vail_graph_add_node",
+      "vail_sense_spatial",
+      "vail_wait_for",
+      "vail_asset_create",
+      "vail_set_property"
+    ]
+  },
+  "calls": [
+    {
+      "tool": "vail_begin_batch",
+      "phase": 1,
+      "success": true,
+      "error": "",
+      "request_bytes": 82,
+      "response_bytes": 98,
+      "latency_ms": 228.42
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 1,
+      "success": true,
+      "error": "",
+      "request_bytes": 93,
+      "response_bytes": 229,
+      "latency_ms": 332.52
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 1,
+      "success": true,
+      "error": "",
+      "request_bytes": 134,
+      "response_bytes": 240,
+      "latency_ms": 389.23
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 1,
+      "success": true,
+      "error": "",
+      "request_bytes": 116,
+      "response_bytes": 210,
+      "latency_ms": 350.82
+    },
+    {
+      "tool": "vail_wait_for",
+      "phase": 1,
+      "success": true,
+      "error": "",
+      "request_bytes": 61,
+      "response_bytes": 122,
+      "latency_ms": 267.19
+    },
+    {
+      "tool": "vail_asset_create",
+      "phase": 2,
+      "success": false,
+      "error": "Timeout receiving Unreal response",
+      "request_bytes": 114,
+      "response_bytes": 65,
+      "latency_ms": 5009.72
+    },
+    {
+      "tool": "vail_graph_add_node",
+      "phase": 2,
+      "success": false,
+      "error": "Timeout receiving Unreal response",
+      "request_bytes": 245,
+      "response_bytes": 65,
+      "latency_ms": 5010.89
+    },
+    {
+      "tool": "vail_graph_add_node",
+      "phase": 2,
+      "success": false,
+      "error": "Material 'M_LavaCrust' has no valid MaterialGraph",
+      "request_bytes": 226,
+      "response_bytes": 81,
+      "latency_ms": 2377.93
+    },
+    {
+      "tool": "vail_graph_add_node",
+      "phase": 2,
+      "success": false,
+      "error": "Material 'M_LavaCrust' has no valid MaterialGraph",
+      "request_bytes": 147,
+      "response_bytes": 81,
+      "latency_ms": 102.78
+    },
+    {
+      "tool": "vail_graph_get_topology",
+      "phase": 2,
+      "success": false,
+      "error": "Material 'M_LavaCrust' has no valid MaterialGraph",
+      "request_bytes": 93,
+      "response_bytes": 81,
+      "latency_ms": 101.64
+    },
+    {
+      "tool": "vail_asset_save",
+      "phase": 2,
+      "success": false,
+      "error": "Unknown VAIL command: vail_asset_save",
+      "request_bytes": 85,
+      "response_bytes": 69,
+      "latency_ms": 101.47
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Outpost_CentralPlatform' already exists",
+      "request_bytes": 166,
+      "response_bytes": 88,
+      "latency_ms": 101.53
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Outpost_Watchtower_Base' already exists",
+      "request_bytes": 171,
+      "response_bytes": 88,
+      "latency_ms": 103.24
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Outpost_Watchtower_Top' already exists",
+      "request_bytes": 172,
+      "response_bytes": 87,
+      "latency_ms": 103.1
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Outpost_Wall_North' already exists",
+      "request_bytes": 164,
+      "response_bytes": 83,
+      "latency_ms": 102.66
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Outpost_Wall_South' already exists",
+      "request_bytes": 165,
+      "response_bytes": 83,
+      "latency_ms": 105.35
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Outpost_Bridge_Span' already exists",
+      "request_bytes": 169,
+      "response_bytes": 84,
+      "latency_ms": 101.99
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Outpost_Bridge_Support_L' already exists",
+      "request_bytes": 174,
+      "response_bytes": 89,
+      "latency_ms": 102.82
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Outpost_Bridge_Support_R' already exists",
+      "request_bytes": 175,
+      "response_bytes": 89,
+      "latency_ms": 103.24
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 100,
+      "response_bytes": 207,
+      "latency_ms": 104.13
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 141,
+      "response_bytes": 284,
+      "latency_ms": 356.99
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 100,
+      "response_bytes": 207,
+      "latency_ms": 406.97
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 141,
+      "response_bytes": 286,
+      "latency_ms": 374.49
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 99,
+      "response_bytes": 205,
+      "latency_ms": 289.4
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": false,
+      "error": "No object scoped. Call vail_set_scope first.",
+      "request_bytes": 141,
+      "response_bytes": 76,
+      "latency_ms": 823.61
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 95,
+      "response_bytes": 197,
+      "latency_ms": 333.45
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 133,
+      "response_bytes": 270,
+      "latency_ms": 375.67
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 95,
+      "response_bytes": 197,
+      "latency_ms": 295.43
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 133,
+      "response_bytes": 271,
+      "latency_ms": 394.32
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 96,
+      "response_bytes": 199,
+      "latency_ms": 112.01
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 133,
+      "response_bytes": 271,
+      "latency_ms": 213.63
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 101,
+      "response_bytes": 209,
+      "latency_ms": 102.44
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 141,
+      "response_bytes": 287,
+      "latency_ms": 151.64
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 101,
+      "response_bytes": 209,
+      "latency_ms": 355.89
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 141,
+      "response_bytes": 287,
+      "latency_ms": 386.09
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Light_Lava_Center' already exists",
+      "request_bytes": 110,
+      "response_bytes": 82,
+      "latency_ms": 282.77
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 94,
+      "response_bytes": 190,
+      "latency_ms": 330.68
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 127,
+      "response_bytes": 230,
+      "latency_ms": 372.11
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 110,
+      "response_bytes": 204,
+      "latency_ms": 332.73
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 117,
+      "response_bytes": 209,
+      "latency_ms": 333.26
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Light_Torch_NE' already exists",
+      "request_bytes": 112,
+      "response_bytes": 79,
+      "latency_ms": 294.91
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 91,
+      "response_bytes": 184,
+      "latency_ms": 332.25
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 128,
+      "response_bytes": 234,
+      "latency_ms": 360.53
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 109,
+      "response_bytes": 201,
+      "latency_ms": 331.37
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 116,
+      "response_bytes": 207,
+      "latency_ms": 343.0
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Light_Torch_NW' already exists",
+      "request_bytes": 113,
+      "response_bytes": 79,
+      "latency_ms": 302.83
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 91,
+      "response_bytes": 184,
+      "latency_ms": 101.92
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 128,
+      "response_bytes": 233,
+      "latency_ms": 226.4
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 109,
+      "response_bytes": 201,
+      "latency_ms": 157.06
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 116,
+      "response_bytes": 208,
+      "latency_ms": 227.88
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Light_Torch_SE' already exists",
+      "request_bytes": 113,
+      "response_bytes": 79,
+      "latency_ms": 103.26
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 91,
+      "response_bytes": 184,
+      "latency_ms": 136.47
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 128,
+      "response_bytes": 233,
+      "latency_ms": 207.65
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 109,
+      "response_bytes": 202,
+      "latency_ms": 224.88
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 116,
+      "response_bytes": 207,
+      "latency_ms": 245.39
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Light_Torch_SW' already exists",
+      "request_bytes": 114,
+      "response_bytes": 79,
+      "latency_ms": 101.46
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 91,
+      "response_bytes": 184,
+      "latency_ms": 102.84
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 128,
+      "response_bytes": 233,
+      "latency_ms": 354.04
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 109,
+      "response_bytes": 202,
+      "latency_ms": 316.06
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 116,
+      "response_bytes": 207,
+      "latency_ms": 139.69
+    },
+    {
+      "tool": "spawn_actor",
+      "phase": 3,
+      "success": false,
+      "error": "Actor with name 'Light_Tower_Beacon' already exists",
+      "request_bytes": 114,
+      "response_bytes": 83,
+      "latency_ms": 103.38
+    },
+    {
+      "tool": "vail_set_scope",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 95,
+      "response_bytes": 192,
+      "latency_ms": 102.46
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 129,
+      "response_bytes": 235,
+      "latency_ms": 382.42
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 110,
+      "response_bytes": 202,
+      "latency_ms": 490.86
+    },
+    {
+      "tool": "vail_set_property",
+      "phase": 3,
+      "success": true,
+      "error": "",
+      "request_bytes": 117,
+      "response_bytes": 209,
+      "latency_ms": 364.15
+    },
+    {
+      "tool": "vail_viewport_frame",
+      "phase": 3,
+      "success": false,
+      "error": "Unknown VAIL command: vail_viewport_frame",
+      "request_bytes": 129,
+      "response_bytes": 73,
+      "latency_ms": 307.55
+    },
+    {
+      "tool": "vail_sense_optical",
+      "phase": 3,
+      "success": false,
+      "error": "Unknown VAIL command: vail_sense_optical",
+      "request_bytes": 74,
+      "response_bytes": 72,
+      "latency_ms": 331.41
+    },
+    {
+      "tool": "vail_sense_spatial",
+      "phase": 3,
+      "success": false,
+      "error": "Unknown VAIL command: vail_sense_spatial",
+      "request_bytes": 81,
+      "response_bytes": 72,
+      "latency_ms": 335.17
+    },
+    {
+      "tool": "vail_sense_mesh",
+      "phase": 3,
+      "success": false,
+      "error": "Unknown VAIL command: vail_sense_mesh",
+      "request_bytes": 84,
+      "response_bytes": 69,
+      "latency_ms": 331.28
+    },
+    {
+      "tool": "vail_sense_shader",
+      "phase": 3,
+      "success": false,
+      "error": "Unknown VAIL command: vail_sense_shader",
+      "request_bytes": 90,
+      "response_bytes": 71,
+      "latency_ms": 367.07
+    },
+    {
+      "tool": "vail_wait_for",
+      "phase": 1,
+      "success": true,
+      "error": "",
+      "request_bytes": 61,
+      "response_bytes": 122,
+      "latency_ms": 304.28
+    },
+    {
+      "tool": "vail_end_batch",
+      "phase": 1,
+      "success": false,
+      "error": "No active batch transaction to end",
+      "request_bytes": 40,
+      "response_bytes": 66,
+      "latency_ms": 328.46
+    }
+  ]
+}

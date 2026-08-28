@@ -47,7 +47,9 @@ public class VAILCore : ModuleRules
 				"Projects",
 				"AssetRegistry",
 				"AssetTools",
-				"MaterialEditor"
+				"MaterialEditor",
+				"UMG",
+				"UMGEditor"
 			}
 		);
 	}

@@ -1,0 +1,33 @@
+{
+  "name": "vail_foliage_query",
+  "description": "Queries foliage instance counts, mesh species, and coverage within a volume.\n\nArgs:\n    bounds_center: Center of query volume [X, Y, Z] (default: [0, 0, 0]).\n    bounds_radius: Search radius (default: 5000.0).",
+  "parameters": {
+    "properties": {
+      "bounds_center": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Bounds Center"
+      },
+      "bounds_radius": {
+        "default": 5000.0,
+        "title": "Bounds Radius",
+        "type": "number"
+      }
+    },
+    "title": "vail_foliage_queryArguments",
+    "type": "object"
+  }
+}

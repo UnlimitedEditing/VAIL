@@ -1,0 +1,40 @@
+{
+  "name": "spatial_apply_style_dials",
+  "description": "Configures parametric aesthetic style dials (clutter density, jitter angle, snap grid) for a zone or room.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "zone": {
+        "type": "string",
+        "description": "Zone or room identifier (e.g. 'Corridor_ZoneA', 'CargoBay', 'Bridge')"
+      },
+      "style_preset": {
+        "type": "string",
+        "enum": [
+          "talisman_derelict",
+          "clean_scifi",
+          "industrial_dense",
+          "minimal_sparse",
+          "gothic_cathedral"
+        ],
+        "description": "Aesthetic style preset"
+      },
+      "clutter_density": {
+        "type": "number",
+        "description": "Normalized clutter density factor (0.0 = sterile to 1.0 = heavy clutter)"
+      },
+      "rotation_jitter_deg": {
+        "type": "number",
+        "description": "Random yaw rotational jitter angle in degrees (e.g. 0 = strict grid, 25 = natural disarray)"
+      },
+      "grid_snap_cm": {
+        "type": "number",
+        "description": "Grid snapping interval in centimeters (e.g. 0, 10, 50, 100)"
+      }
+    },
+    "required": [
+      "zone",
+      "style_preset"
+    ]
+  }
+}

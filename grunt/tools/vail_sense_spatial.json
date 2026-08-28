@@ -1,0 +1,22 @@
+{
+  "name": "vail_sense_spatial",
+  "description": "Computes spatial proprioception, ground clearance, surface normal, overlap depth, and frustum visibility.\n\nArgs:\n    actor_id: Target actor label or identifier.\n    trace_channel: Collision trace channel ('Visibility', 'Camera', 'WorldStatic').",
+  "parameters": {
+    "properties": {
+      "actor_id": {
+        "title": "Actor Id",
+        "type": "string"
+      },
+      "trace_channel": {
+        "default": "Visibility",
+        "title": "Trace Channel",
+        "type": "string"
+      }
+    },
+    "required": [
+      "actor_id"
+    ],
+    "title": "vail_sense_spatialArguments",
+    "type": "object"
+  }
+}

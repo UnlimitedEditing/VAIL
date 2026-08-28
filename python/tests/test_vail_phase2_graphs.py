@@ -103,19 +103,61 @@ def run_phase2_verification():
     print(f"Multiply Node: {json.dumps(res_mul, indent=2)}")
     mul_node_id = res_mul.get("result", {}).get("node_id")
 
-    # 3.4 Inspect Material Graph Topology
-    print("\n--- TEST 4: Material Graph Topology Inspection ---")
+    # 3.4 Wire Material Graph Pins
+    print("\n--- TEST 4: Material Graph Pin Wiring ---")
+    if vec_node_id and mul_node_id:
+        res_wire1 = conn.send_command("vail_graph_connect_pins", {
+            "asset_path": "/Game/VAIL_Test/M_GlowCore",
+            "source_pin": f"{vec_node_id}:RGBA",
+            "target_pin": f"{mul_node_id}:A"
+        })
+        print(f"Wire Vector -> Multiply: {json.dumps(res_wire1, indent=2)}")
+
+    if scalar_node_id and mul_node_id:
+        res_wire2 = conn.send_command("vail_graph_connect_pins", {
+            "asset_path": "/Game/VAIL_Test/M_GlowCore",
+            "source_pin": f"{scalar_node_id}:Output",
+            "target_pin": f"{mul_node_id}:B"
+        })
+        print(f"Wire Scalar -> Multiply: {json.dumps(res_wire2, indent=2)}")
+
+    if mul_node_id:
+        res_wire3 = conn.send_command("vail_graph_connect_pins", {
+            "asset_path": "/Game/VAIL_Test/M_GlowCore",
+            "source_pin": f"{mul_node_id}:Output",
+            "target_pin": "Root:EmissiveColor"
+        })
+        print(f"Wire Multiply -> Root EmissiveColor: {json.dumps(res_wire3, indent=2)}")
+
+    # 3.5 Inspect Material Graph Topology
+    print("\n--- TEST 5: Material Graph Topology Inspection ---")
     res_top = conn.send_command("vail_graph_get_topology", {
         "asset_path": "/Game/VAIL_Test/M_GlowCore"
     })
     print(f"Material Topology:\n{json.dumps(res_top, indent=2)}")
 
-    # =========================================================================
-    # TEST 5: Blueprint EventGraph Node Spawning & Wiring
-    # =========================================================================
-    print("\n--- TEST 5: Blueprint EventGraph Logic Wiring ---")
+    # 3.6 Save Material Asset
+    res_save_mat = conn.send_command("vail_asset_save", {"asset_path": "/Game/VAIL_Test/M_GlowCore"})
+    print(f"Save Material: {json.dumps(res_save_mat, indent=2)}")
 
-    # 5.1 Spawn PrintString Function Node
+    # =========================================================================
+    # TEST 6: Blueprint EventGraph Logic Wiring
+    # =========================================================================
+    print("\n--- TEST 6: Blueprint EventGraph Logic Wiring ---")
+
+    # 6.1 Inspect initial topology to get BeginPlay Node ID
+    res_bp_init = conn.send_command("vail_graph_get_topology", {
+        "asset_path": "/Game/VAIL_Test/BP_LaserTurret",
+        "graph_name": "EventGraph"
+    })
+    nodes = res_bp_init.get("result", {}).get("nodes", [])
+    begin_play_id = None
+    for n in nodes:
+        if "BeginPlay" in n.get("node_title", ""):
+            begin_play_id = n.get("node_id")
+            break
+
+    # 6.2 Spawn PrintString Function Node
     res_print = conn.send_command("vail_graph_add_node", {
         "asset_path": "/Game/VAIL_Test/BP_LaserTurret",
         "graph_name": "EventGraph",
@@ -126,13 +168,27 @@ def run_phase2_verification():
     print(f"PrintString Node: {json.dumps(res_print, indent=2)}")
     print_node_id = res_print.get("result", {}).get("node_id")
 
-    # 5.2 Inspect Blueprint EventGraph Topology
-    print("\n--- TEST 6: Blueprint EventGraph Topology Inspection ---")
+    # 6.3 Wire BeginPlay -> PrintString
+    if begin_play_id and print_node_id:
+        res_wire_bp = conn.send_command("vail_graph_connect_pins", {
+            "asset_path": "/Game/VAIL_Test/BP_LaserTurret",
+            "graph_name": "EventGraph",
+            "source_pin": f"{begin_play_id}:then",
+            "target_pin": f"{print_node_id}:execute"
+        })
+        print(f"Wire BeginPlay -> PrintString: {json.dumps(res_wire_bp, indent=2)}")
+
+    # 6.4 Inspect Blueprint EventGraph Topology
+    print("\n--- TEST 7: Blueprint EventGraph Topology Inspection ---")
     res_bp_top = conn.send_command("vail_graph_get_topology", {
         "asset_path": "/Game/VAIL_Test/BP_LaserTurret",
         "graph_name": "EventGraph"
     })
     print(f"Blueprint Topology:\n{json.dumps(res_bp_top, indent=2)}")
+
+    # 6.5 Save Blueprint Asset
+    res_save_bp = conn.send_command("vail_asset_save", {"asset_path": "/Game/VAIL_Test/BP_LaserTurret"})
+    print(f"Save Blueprint: {json.dumps(res_save_bp, indent=2)}")
 
     conn.disconnect()
     print("\n" + "=" * 80)

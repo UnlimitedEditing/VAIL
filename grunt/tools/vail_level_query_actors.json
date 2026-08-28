@@ -1,0 +1,30 @@
+{
+  "name": "vail_level_query_actors",
+  "description": "Queries actors in the level matching pattern, class, or tag filters.\n\nArgs:\n    pattern: Wildcard pattern for actor label (e.g. 'Light*', '*Enemy*').\n    class_filter: Filter by actor class name (e.g. 'PointLight', 'StaticMeshActor').\n    tag_filter: Filter by actor tag or gameplay tag.\n    max_results: Maximum number of actors to return (default: 50).",
+  "parameters": {
+    "properties": {
+      "class_filter": {
+        "default": "",
+        "title": "Class Filter",
+        "type": "string"
+      },
+      "max_results": {
+        "default": 50,
+        "title": "Max Results",
+        "type": "integer"
+      },
+      "pattern": {
+        "default": "*",
+        "title": "Pattern",
+        "type": "string"
+      },
+      "tag_filter": {
+        "default": "",
+        "title": "Tag Filter",
+        "type": "string"
+      }
+    },
+    "title": "vail_level_query_actorsArguments",
+    "type": "object"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "vail_sequencer_add_key",
+  "description": "Inserts or modifies keyframes on a LevelSequence track.\n\nArgs:\n    sequence_path: Path to LevelSequence asset.\n    track_id: Track identifier or property binding name.\n    frame_number: Sequence frame index.\n    value: Formatted value string or numeric value (e.g. '5000.0', '(R=1,G=0.5,B=0,A=1)', 'X=100 Y=0 Z=50').\n    interp_mode: Key interpolation curve ('Linear', 'Cubic', 'Constant', 'User').",
+  "parameters": {
+    "properties": {
+      "frame_number": {
+        "title": "Frame Number",
+        "type": "integer"
+      },
+      "interp_mode": {
+        "default": "Linear",
+        "title": "Interp Mode",
+        "type": "string"
+      },
+      "sequence_path": {
+        "title": "Sequence Path",
+        "type": "string"
+      },
+      "track_id": {
+        "title": "Track Id",
+        "type": "string"
+      },
+      "value": {
+        "title": "Value"
+      }
+    },
+    "required": [
+      "sequence_path",
+      "track_id",
+      "frame_number",
+      "value"
+    ],
+    "title": "vail_sequencer_add_keyArguments",
+    "type": "object"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "vail_widget_tree_get",
+  "description": "Retrieves the complete widget hierarchy, slot layouts, and component properties of a Widget Blueprint.\n\nArgs:\n    widget_path: Path to Widget Blueprint asset (e.g. '/Game/UI/WBP_MainMenu').",
+  "parameters": {
+    "properties": {
+      "widget_path": {
+        "title": "Widget Path",
+        "type": "string"
+      }
+    },
+    "required": [
+      "widget_path"
+    ],
+    "title": "vail_widget_tree_getArguments",
+    "type": "object"
+  }
+}

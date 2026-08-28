@@ -1,0 +1,17 @@
+{
+  "name": "vail_sense_shader",
+  "description": "Inspects shader complexity, instruction count, texture samplers, roughness, and Lumen cache status.\n\nArgs:\n    material_path: Material or MaterialInstance asset path (e.g. '/Game/Materials/M_HeroShader').",
+  "parameters": {
+    "properties": {
+      "material_path": {
+        "title": "Material Path",
+        "type": "string"
+      }
+    },
+    "required": [
+      "material_path"
+    ],
+    "title": "vail_sense_shaderArguments",
+    "type": "object"
+  }
+}

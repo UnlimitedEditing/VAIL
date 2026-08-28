@@ -1,0 +1,26 @@
+{
+  "name": "vail_audio_set_parameter",
+  "description": "Sets a runtime parameter on an active MetaSound audio graph.\n\nArgs:\n    sound_actor: AudioComponent or Sound actor name.\n    parameter_name: MetaSound input parameter name (e.g. 'PitchMod', 'ReverbGain', 'TriggerPlay').\n    value: Formatted value or numeric float/bool.",
+  "parameters": {
+    "properties": {
+      "parameter_name": {
+        "title": "Parameter Name",
+        "type": "string"
+      },
+      "sound_actor": {
+        "title": "Sound Actor",
+        "type": "string"
+      },
+      "value": {
+        "title": "Value"
+      }
+    },
+    "required": [
+      "sound_actor",
+      "parameter_name",
+      "value"
+    ],
+    "title": "vail_audio_set_parameterArguments",
+    "type": "object"
+  }
+}

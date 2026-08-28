@@ -1,0 +1,32 @@
+{
+  "name": "vail_viewport_frame",
+  "description": "Frames the viewport camera onto an actor or spatial coordinate without stealing OS focus.\n\nArgs:\n    target: Actor label or 'X,Y,Z' target coordinate.\n    distance: Boom camera distance (default: 500.0).\n    pitch: Pitch angle in degrees (default: -20.0).\n    yaw: Yaw angle in degrees (default: 0.0).",
+  "parameters": {
+    "properties": {
+      "distance": {
+        "default": 500.0,
+        "title": "Distance",
+        "type": "number"
+      },
+      "pitch": {
+        "default": -20.0,
+        "title": "Pitch",
+        "type": "number"
+      },
+      "target": {
+        "title": "Target",
+        "type": "string"
+      },
+      "yaw": {
+        "default": 0.0,
+        "title": "Yaw",
+        "type": "number"
+      }
+    },
+    "required": [
+      "target"
+    ],
+    "title": "vail_viewport_frameArguments",
+    "type": "object"
+  }
+}

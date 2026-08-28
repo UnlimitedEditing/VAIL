@@ -1,0 +1,32 @@
+{
+  "name": "vail_widget_set_slot",
+  "description": "Mutates slot positioning, anchors, and alignment for a widget inside its parent container.\n\nArgs:\n    widget_path: Path to Widget Blueprint asset.\n    element_name: Target widget element name.\n    layout: Layout configuration dictionary (e.g. {'anchors': [0.5, 0.5, 0.5, 0.5], 'position': [0, 0], 'size': [200, 50], 'alignment': [0.5, 0.5]}).\n    slot_type: Slot class type ('CanvasSlot', 'VerticalBoxSlot', 'HorizontalBoxSlot', 'OverlaySlot').",
+  "parameters": {
+    "properties": {
+      "element_name": {
+        "title": "Element Name",
+        "type": "string"
+      },
+      "layout": {
+        "title": "Layout",
+        "type": "object"
+      },
+      "slot_type": {
+        "default": "CanvasSlot",
+        "title": "Slot Type",
+        "type": "string"
+      },
+      "widget_path": {
+        "title": "Widget Path",
+        "type": "string"
+      }
+    },
+    "required": [
+      "widget_path",
+      "element_name",
+      "layout"
+    ],
+    "title": "vail_widget_set_slotArguments",
+    "type": "object"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "vail_sense_optical",
+  "description": "Calculates rendering optics metrics without transferring full 4K framebuffers.\n\nArgs:\n    target_camera: Target CineCameraActor label or empty for active viewport camera.\n    sample_region: Region to sample ('full', 'center_spot', 'quadrants').",
+  "parameters": {
+    "properties": {
+      "sample_region": {
+        "default": "full",
+        "title": "Sample Region",
+        "type": "string"
+      },
+      "target_camera": {
+        "default": "",
+        "title": "Target Camera",
+        "type": "string"
+      }
+    },
+    "title": "vail_sense_opticalArguments",
+    "type": "object"
+  }
+}

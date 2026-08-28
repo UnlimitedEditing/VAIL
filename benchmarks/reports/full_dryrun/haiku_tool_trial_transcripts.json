@@ -1,0 +1,417 @@
+{
+  "mode": "DRY RUN (mocked, wiring test only)",
+  "results": [
+    {
+      "scenario_id": "vail_set_scope",
+      "prompt": "Set your attention scope to the actor 'DirectionalLight' in the Details panel.",
+      "turns": 2,
+      "tool_calls": [
+        {
+          "name": "vail_get_tree",
+          "arguments": {
+            "max_depth": 1,
+            "category_filter": ""
+          },
+          "result": {
+            "status": "not_executed",
+            "reason": "dry-run or no live UE connection"
+          }
+        }
+      ],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 300,
+      "total_output_tokens": 60
+    },
+    {
+      "scenario_id": "vail_get_tree",
+      "prompt": "Get the compact property tree for the currently scoped actor, up to depth 2.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_find",
+      "prompt": "Search for the editor command or property related to 'Compile' anywhere in the editor.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_execute_command",
+      "prompt": "Execute the editor command with semantic ID 'Kismet.Compile'.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_set_property",
+      "prompt": "Set the property 'Mobility' on the currently scoped actor to 'Movable'.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_wait_for",
+      "prompt": "Wait for the editor UI and any background compilation to fully settle, up to 5 seconds.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_begin_batch",
+      "prompt": "Begin a compound transaction batch titled 'Sweep Test Batch' so the next edits group into one Undo step.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_end_batch",
+      "prompt": "Commit and close the currently active compound transaction batch.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_graph_get_topology",
+      "prompt": "Get the node graph topology (nodes, pins, wires) of the Blueprint asset at /Game/Blueprints/BP_Player.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_graph_add_node",
+      "prompt": "Add a new 'PrintString' node at position (200, 300) into the EventGraph of the Blueprint at /Game/Blueprints/BP_Player.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_graph_connect_pins",
+      "prompt": "Connect the output pin 'Then' of node 'EventBeginPlay' to the input pin 'exec' of node 'PrintString' in the EventGraph of /Game/Blueprints/BP_Player.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_graph_delete_node",
+      "prompt": "Delete the node with ID 'PrintString_1' from the EventGraph of the Blueprint at /Game/Blueprints/BP_Player.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_asset_create",
+      "prompt": "Create a new Blueprint asset at /Game/Blueprints/BP_TestSweep with parent class 'Actor'.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_asset_query",
+      "prompt": "Query the Asset Registry for all assets under package path /Game/Blueprints of class 'Blueprint'.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_asset_save",
+      "prompt": "Save the asset package at /Game/Blueprints/BP_Player to disk.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_level_spawn_actor",
+      "prompt": "Spawn a new actor labeled 'TestCube' from asset /Engine/BasicShapes/Cube at location (0,0,100).",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_level_delete_actor",
+      "prompt": "Delete the actor with ID 'TestCube' from the active level.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_level_query_actors",
+      "prompt": "Query all actors in the level whose name matches the pattern 'BP_*', up to 20 results.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_viewport_frame",
+      "prompt": "Frame the viewport camera onto the actor 'BP_Player' from a distance of 500 units.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_project_build",
+      "prompt": "Trigger a project build for the Windows target platform, using the Development build configuration.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_landscape_create",
+      "prompt": "Create a new landscape terrain actor at location (0,0,0) with a 1x1 component grid.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_landscape_sculpt",
+      "prompt": "Apply a raise sculpting brush at target location (500,500,0) with radius 1000 and strength 0.5.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_landscape_paint",
+      "prompt": "Paint the landscape layer 'Grass' at target location (500,500,0) with radius 500 and strength 0.8.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_foliage_scatter",
+      "prompt": "Scatter foliage using mesh /Game/Foliage/Fern in a 1000-unit radius around (0,0,0) with density 0.3.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_foliage_query",
+      "prompt": "Query foliage instance counts within a 1000-unit radius of (0,0,0).",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_audio_play",
+      "prompt": "Play the sound asset /Game/Audio/SFX_Explosion at location (0,0,0).",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_audio_set_parameter",
+      "prompt": "Set the MetaSound parameter 'Volume' to '0.5' on the audio actor 'Ambience_01'.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_control_rig_query",
+      "prompt": "Query the control hierarchy of the Control Rig asset at /Game/Characters/CR_Player.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_control_rig_set_transform",
+      "prompt": "Set the control 'hand_r_ctrl' on Control Rig /Game/Characters/CR_Player to location (10,20,30).",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_sequencer_query",
+      "prompt": "Inspect all tracks and keyframe ranges of the LevelSequence asset at /Game/Cinematics/Seq_Intro.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_sequencer_add_track",
+      "prompt": "Add a transform track binding for actor 'BP_Player' to the LevelSequence at /Game/Cinematics/Seq_Intro.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_sequencer_add_key",
+      "prompt": "Insert a keyframe at frame 30 with value '(X=0,Y=0,Z=200)' on the transform track of the LevelSequence at /Game/Cinematics/Seq_Intro.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_widget_tree_get",
+      "prompt": "Retrieve the full widget hierarchy of the Widget Blueprint at /Game/UI/WBP_MainMenu.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_widget_add_element",
+      "prompt": "Add a new Button element named 'PlayButton' into the root panel of the Widget Blueprint at /Game/UI/WBP_MainMenu.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_widget_set_slot",
+      "prompt": "Set the slot layout of element 'PlayButton' in /Game/UI/WBP_MainMenu to anchor centered with size (200,50).",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_widget_bind_event",
+      "prompt": "Bind the 'OnClicked' event of element 'PlayButton' in /Game/UI/WBP_MainMenu to a Blueprint function named 'HandlePlayClicked'.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_sense_mesh",
+      "prompt": "Inspect the geometric health (triangle count, Nanite status, UV overlap) of the asset /Game/Meshes/SM_Rock_01.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_sense_shader",
+      "prompt": "Inspect the shader complexity and instruction count of the material at /Game/Materials/M_Rock.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_sense_optical",
+      "prompt": "Calculate rendering optics metrics for the target camera 'CineCameraActor_1'.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "vail_sense_spatial",
+      "prompt": "Compute spatial proprioception (ground clearance, surface normal) for actor 'BP_Player' along the visibility trace channel.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "vail_sense_mesh",
+  "description": "Inspects geometric health, triangle count, Nanite status, UV overlap %, and collision complexity.\n\nArgs:\n    asset_or_actor: StaticMesh / SkeletalMesh asset path or level actor label.",
+  "parameters": {
+    "properties": {
+      "asset_or_actor": {
+        "title": "Asset Or Actor",
+        "type": "string"
+      }
+    },
+    "required": [
+      "asset_or_actor"
+    ],
+    "title": "vail_sense_meshArguments",
+    "type": "object"
+  }
+}

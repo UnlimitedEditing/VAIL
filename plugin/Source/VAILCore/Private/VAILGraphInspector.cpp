@@ -91,13 +91,16 @@ UEdGraph* FVAILGraphInspector::ResolveGraph(UObject* AssetObject, const FString&
 	// 2. Material Graphs
 	if (UMaterial* Material = Cast<UMaterial>(AssetObject))
 	{
-		if (Material->MaterialGraph)
+		if (!Material->MaterialGraph)
 		{
-			return Material->MaterialGraph;
+			UMaterialGraph* NewMaterialGraph = NewObject<UMaterialGraph>(Material, UMaterialGraph::StaticClass(), NAME_None, RF_Transactional);
+			NewMaterialGraph->Schema = UMaterialGraphSchema::StaticClass();
+			NewMaterialGraph->Material = Material;
+			Material->MaterialGraph = NewMaterialGraph;
+			NewMaterialGraph->RebuildGraph();
 		}
 
-		ErrorMessage = FString::Printf(TEXT("Material '%s' has no valid MaterialGraph"), *Material->GetName());
-		return nullptr;
+		return Material->MaterialGraph;
 	}
 
 	// 3. Direct UEdGraph
@@ -123,6 +126,14 @@ UEdGraphNode* FVAILGraphInspector::FindNode(UEdGraph* Graph, const FString& Node
 			{
 				return Node;
 			}
+
+			if (Node->IsA<UMaterialGraphNode_Root>() &&
+				(NodeId.Equals(TEXT("Root"), ESearchCase::IgnoreCase) ||
+				 NodeId.Equals(TEXT("Material"), ESearchCase::IgnoreCase) ||
+				 NodeId.Equals(TEXT("Result"), ESearchCase::IgnoreCase)))
+			{
+				return Node;
+			}
 		}
 	}
 	return nullptr;
@@ -132,6 +143,17 @@ UEdGraphPin* FVAILGraphInspector::FindPin(UEdGraphNode* Node, const FString& Pin
 {
 	if (!Node) return nullptr;
 
+	auto NormalizePinName = [](const FString& InName) -> FString
+	{
+		FString Result = InName;
+		Result.RemoveSpacesInline();
+		Result.ReplaceInline(TEXT("_"), TEXT(""));
+		return Result.ToLower();
+	};
+
+	FString TargetNormalized = NormalizePinName(PinName);
+
+	// 1. Exact or normalized match
 	for (UEdGraphPin* Pin : Node->Pins)
 	{
 		if (Pin)
@@ -142,12 +164,36 @@ UEdGraphPin* FVAILGraphInspector::FindPin(UEdGraphNode* Node, const FString& Pin
 			}
 
 			if (Pin->PinName.ToString().Equals(PinName, ESearchCase::IgnoreCase) ||
-				Pin->PinFriendlyName.ToString().Equals(PinName, ESearchCase::IgnoreCase))
+				Pin->PinFriendlyName.ToString().Equals(PinName, ESearchCase::IgnoreCase) ||
+				NormalizePinName(Pin->PinName.ToString()) == TargetNormalized ||
+				NormalizePinName(Pin->PinFriendlyName.ToString()) == TargetNormalized)
 			{
 				return Pin;
 			}
 		}
 	}
+
+	// 2. Fuzzy / fallback alias match
+	for (UEdGraphPin* Pin : Node->Pins)
+	{
+		if (Pin)
+		{
+			if (Direction != EGPD_MAX && Pin->Direction != Direction)
+			{
+				continue;
+			}
+
+			if ((TargetNormalized == TEXT("output") || TargetNormalized == TEXT("out") || TargetNormalized == TEXT("result")) && Pin->Direction == EGPD_Output)
+			{
+				return Pin;
+			}
+			if ((TargetNormalized == TEXT("rgba") || TargetNormalized == TEXT("rgb")) && Pin->PinName.ToString().StartsWith(TEXT("RGB"), ESearchCase::IgnoreCase))
+			{
+				return Pin;
+			}
+		}
+	}
+
 	return nullptr;
 }
 

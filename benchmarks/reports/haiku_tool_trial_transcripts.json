@@ -1,0 +1,77 @@
+{
+  "mode": "DRY RUN (mocked, wiring test only)",
+  "results": [
+    {
+      "scenario_id": "single_property_edit",
+      "prompt": "Set the DirectionalLight's intensity to 35000 lux.",
+      "turns": 2,
+      "tool_calls": [
+        {
+          "name": "vail_get_tree",
+          "arguments": {
+            "max_depth": 1,
+            "category_filter": ""
+          },
+          "result": {
+            "status": "not_executed",
+            "reason": "dry-run or no live UE connection"
+          }
+        }
+      ],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 300,
+      "total_output_tokens": 60
+    },
+    {
+      "scenario_id": "compound_property_edit",
+      "prompt": "Change the DirectionalLight's color to a twilight blue (roughly R=0.25 G=0.45 B=1.0) and rotate it to pitch -8, yaw 110, as a single undo step.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "find_before_acting",
+      "prompt": "Find the editor command for compiling the currently open Blueprint, then run it.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "actor_query",
+      "prompt": "List the actors currently in the level.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "graph_topology",
+      "prompt": "Get the node graph topology of the Blueprint asset at /Game/Blueprints/BP_Player.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    },
+    {
+      "scenario_id": "save_project",
+      "prompt": "Save all unsaved changes in the project.",
+      "turns": 1,
+      "tool_calls": [],
+      "schema_errors": [],
+      "final_text": "[dry-run] mocked completion",
+      "total_input_tokens": 150,
+      "total_output_tokens": 30
+    }
+  ]
+}

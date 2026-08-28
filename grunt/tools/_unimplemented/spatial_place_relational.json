@@ -1,0 +1,59 @@
+{
+  "name": "spatial_place_relational",
+  "description": "Relational spatial placement engine. Snaps and positions an actor relative to scene anchors using CAD constraint solving, collision bounding, and style dials.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "asset": {
+        "type": "string",
+        "description": "Asset archetype or blueprint class (e.g. 'BP_Prop_HeroCrate', 'PointLight', 'SM_Floor512', 'BP_Prop_FoodContainer')"
+      },
+      "anchor_actor": {
+        "type": "string",
+        "description": "Reference actor name or label in level (e.g. 'Corridor_DoorL', 'Floor_0', 'Chandelier')"
+      },
+      "relation": {
+        "type": "string",
+        "enum": [
+          "on_surface",
+          "adjacent_to",
+          "overhead",
+          "align_with",
+          "cluster_near",
+          "perimeter_of",
+          "mount_wall",
+          "hang_ceiling",
+          "snap_socket"
+        ],
+        "description": "Geometric spatial relationship rule"
+      },
+      "socket_name": {
+        "type": "string",
+        "default": "",
+        "description": "Optional specific mesh socket to snap to"
+      },
+      "local_offset": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "description": "Optional local [X, Y, Z] offset relative to anchor bounds"
+      },
+      "actor_label": {
+        "type": "string",
+        "default": "",
+        "description": "Optional custom outliner label for the spawned instance"
+      },
+      "folder_path": {
+        "type": "string",
+        "default": "",
+        "description": "Optional Outliner folder path (e.g. 'Props/Clutter', 'Lighting/Fill')"
+      }
+    },
+    "required": [
+      "asset",
+      "anchor_actor",
+      "relation"
+    ]
+  }
+}

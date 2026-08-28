@@ -16,6 +16,9 @@ venv/
 *.egg-info/
 .pytest_cache/
 
+# Grunt model checkpoints (large binaries, not meant for normal git history)
+grunt/checkpoints/*.pkl
+
 # IDE / OS
 .vscode/
 .idea/

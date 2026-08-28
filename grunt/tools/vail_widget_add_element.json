@@ -1,0 +1,56 @@
+{
+  "name": "vail_widget_add_element",
+  "description": "Adds a UMG widget element into a widget tree hierarchy with initial slot layout and styling.\n\nArgs:\n    widget_path: Target Widget Blueprint asset path.\n    element_type: Widget class ('CanvasPanel', 'Button', 'TextBlock', 'Image', 'VerticalBox', 'HorizontalBox', 'Overlay', 'ProgressBar', 'Slider', 'Border').\n    element_name: Unique variable name for the element.\n    parent_name: Parent container widget name (defaults to root widget).\n    slot_properties: Slot layout dict (anchors, offsets, position, size, alignment, padding, z_order).\n    content_properties: Widget property presets (text, color, font_size, visibility, brush).",
+  "parameters": {
+    "properties": {
+      "content_properties": {
+        "anyOf": [
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Content Properties"
+      },
+      "element_name": {
+        "title": "Element Name",
+        "type": "string"
+      },
+      "element_type": {
+        "title": "Element Type",
+        "type": "string"
+      },
+      "parent_name": {
+        "default": "",
+        "title": "Parent Name",
+        "type": "string"
+      },
+      "slot_properties": {
+        "anyOf": [
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Slot Properties"
+      },
+      "widget_path": {
+        "title": "Widget Path",
+        "type": "string"
+      }
+    },
+    "required": [
+      "widget_path",
+      "element_type",
+      "element_name"
+    ],
+    "title": "vail_widget_add_elementArguments",
+    "type": "object"
+  }
+}

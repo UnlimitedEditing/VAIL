@@ -1,0 +1,197 @@
+{
+  "suite_name": "Haiku_Tool_Trial_DRYRUN",
+  "session_start": 1787937640.1601722,
+  "session_duration_s": 0.0,
+  "summary_metrics": {
+    "total_scenarios_tested": 6,
+    "scenarios_with_measured_token_comparison": 0,
+    "zero_defect_first_pass_rate": "100.00%",
+    "anti_slop_frontier_intervention_rate": "0.00%",
+    "measured_baseline_tokens_total": null,
+    "measured_vail_tokens_total": null,
+    "measured_tokens_saved_total": null,
+    "measured_token_savings_pct": "n/a (no baseline tokens measured)",
+    "avg_grunt_latency_ms": 0.05,
+    "avg_ue5_engine_latency_ms": 0.0,
+    "settle_compliance_rate": "0.00%"
+  },
+  "events": [
+    {
+      "step_index": 1,
+      "timestamp": 1787937640.160377,
+      "scenario_id": "single_property_edit",
+      "macro_intent": "Set the DirectionalLight's intensity to 35000 lux.",
+      "grunt": {
+        "dispatched_tool": "vail_get_tree",
+        "arguments": {
+          "max_depth": 1,
+          "category_filter": ""
+        },
+        "neural_latency_ms": 0.15,
+        "model_parameters": "26M Needle"
+      },
+      "engine": {
+        "status": "success",
+        "roundtrip_ms": 0.0,
+        "settle_verified": false,
+        "rolled_back": false,
+        "screen_warnings": [],
+        "raw_result": {}
+      },
+      "audit": {
+        "first_pass_clean": true,
+        "frontier_intervention": false,
+        "measured": false,
+        "token_source": "unmeasured",
+        "baseline_tokens": 360,
+        "vail_tokens": null,
+        "tokens_saved": null
+      }
+    },
+    {
+      "step_index": 2,
+      "timestamp": 1787937640.1604521,
+      "scenario_id": "compound_property_edit",
+      "macro_intent": "Change the DirectionalLight's color to a twilight blue (roughly R=0.25 G=0.45 B=1.0) and rotate it to pitch -8, yaw 110, as a single undo step.",
+      "grunt": {
+        "dispatched_tool": null,
+        "arguments": {},
+        "neural_latency_ms": 0.04,
+        "model_parameters": "26M Needle"
+      },
+      "engine": {
+        "status": "success",
+        "roundtrip_ms": 0.0,
+        "settle_verified": false,
+        "rolled_back": false,
+        "screen_warnings": [],
+        "raw_result": {}
+      },
+      "audit": {
+        "first_pass_clean": true,
+        "frontier_intervention": false,
+        "measured": false,
+        "token_source": "unmeasured",
+        "baseline_tokens": 180,
+        "vail_tokens": null,
+        "tokens_saved": null
+      }
+    },
+    {
+      "step_index": 3,
+      "timestamp": 1787937640.1604981,
+      "scenario_id": "find_before_acting",
+      "macro_intent": "Find the editor command for compiling the currently open Blueprint, then run it.",
+      "grunt": {
+        "dispatched_tool": null,
+        "arguments": {},
+        "neural_latency_ms": 0.03,
+        "model_parameters": "26M Needle"
+      },
+      "engine": {
+        "status": "success",
+        "roundtrip_ms": 0.0,
+        "settle_verified": false,
+        "rolled_back": false,
+        "screen_warnings": [],
+        "raw_result": {}
+      },
+      "audit": {
+        "first_pass_clean": true,
+        "frontier_intervention": false,
+        "measured": false,
+        "token_source": "unmeasured",
+        "baseline_tokens": 180,
+        "vail_tokens": null,
+        "tokens_saved": null
+      }
+    },
+    {
+      "step_index": 4,
+      "timestamp": 1787937640.1605353,
+      "scenario_id": "actor_query",
+      "macro_intent": "List the actors currently in the level.",
+      "grunt": {
+        "dispatched_tool": null,
+        "arguments": {},
+        "neural_latency_ms": 0.02,
+        "model_parameters": "26M Needle"
+      },
+      "engine": {
+        "status": "success",
+        "roundtrip_ms": 0.0,
+        "settle_verified": false,
+        "rolled_back": false,
+        "screen_warnings": [],
+        "raw_result": {}
+      },
+      "audit": {
+        "first_pass_clean": true,
+        "frontier_intervention": false,
+        "measured": false,
+        "token_source": "unmeasured",
+        "baseline_tokens": 180,
+        "vail_tokens": null,
+        "tokens_saved": null
+      }
+    },
+    {
+      "step_index": 5,
+      "timestamp": 1787937640.1605694,
+      "scenario_id": "graph_topology",
+      "macro_intent": "Get the node graph topology of the Blueprint asset at /Game/Blueprints/BP_Player.",
+      "grunt": {
+        "dispatched_tool": null,
+        "arguments": {},
+        "neural_latency_ms": 0.02,
+        "model_parameters": "26M Needle"
+      },
+      "engine": {
+        "status": "success",
+        "roundtrip_ms": 0.0,
+        "settle_verified": false,
+        "rolled_back": false,
+        "screen_warnings": [],
+        "raw_result": {}
+      },
+      "audit": {
+        "first_pass_clean": true,
+        "frontier_intervention": false,
+        "measured": false,
+        "token_source": "unmeasured",
+        "baseline_tokens": 180,
+        "vail_tokens": null,
+        "tokens_saved": null
+      }
+    },
+    {
+      "step_index": 6,
+      "timestamp": 1787937640.1606064,
+      "scenario_id": "save_project",
+      "macro_intent": "Save all unsaved changes in the project.",
+      "grunt": {
+        "dispatched_tool": null,
+        "arguments": {},
+        "neural_latency_ms": 0.02,
+        "model_parameters": "26M Needle"
+      },
+      "engine": {
+        "status": "success",
+        "roundtrip_ms": 0.0,
+        "settle_verified": false,
+        "rolled_back": false,
+        "screen_warnings": [],
+        "raw_result": {}
+      },
+      "audit": {
+        "first_pass_clean": true,
+        "frontier_intervention": false,
+        "measured": false,
+        "token_source": "unmeasured",
+        "baseline_tokens": 180,
+        "vail_tokens": null,
+        "tokens_saved": null
+      }
+    }
+  ]
+}

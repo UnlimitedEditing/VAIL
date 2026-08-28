@@ -1,0 +1,25 @@
+{
+  "name": "vail_project_build",
+  "description": "Triggers project compilation, cooking, or standalone packaging pipelines.\n\nArgs:\n    target_platform: Target platform ('Windows', 'Linux', 'Android', 'iOS'; default: 'Windows').\n    build_config: Build configuration ('Development', 'Shipping', 'DebugGame'; default: 'Development').\n    clean: If True, performs a clean rebuild (default: False).",
+  "parameters": {
+    "properties": {
+      "build_config": {
+        "default": "Development",
+        "title": "Build Config",
+        "type": "string"
+      },
+      "clean": {
+        "default": false,
+        "title": "Clean",
+        "type": "boolean"
+      },
+      "target_platform": {
+        "default": "Windows",
+        "title": "Target Platform",
+        "type": "string"
+      }
+    },
+    "title": "vail_project_buildArguments",
+    "type": "object"
+  }
+}

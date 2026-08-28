@@ -47,6 +47,14 @@ public:
 		FString& ErrorMessage
 	);
 
+	/**
+	 * Headlessly saves an asset or package to disk.
+	 */
+	bool SaveAsset(
+		const FString& AssetPath,
+		FString& ErrorMessage
+	);
+
 private:
 	FVAILAssetManager();
 	~FVAILAssetManager();

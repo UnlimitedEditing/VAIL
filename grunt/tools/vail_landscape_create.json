@@ -1,0 +1,53 @@
+{
+  "name": "vail_landscape_create",
+  "description": "Creates a landscape terrain actor with specified grid resolution and material.\n\nArgs:\n    section_size: Quads per section (7, 15, 31, 63, 127, 255; default: 63).\n    sections_per_component: Sections per component (1 or 2; default: 1).\n    component_count_x: Component count along X axis (default: 8).\n    component_count_y: Component count along Y axis (default: 8).\n    material_path: Landscape material package path.\n    location: World placement origin [X, Y, Z] (default: [0, 0, 0]).",
+  "parameters": {
+    "properties": {
+      "component_count_x": {
+        "default": 8,
+        "title": "Component Count X",
+        "type": "integer"
+      },
+      "component_count_y": {
+        "default": 8,
+        "title": "Component Count Y",
+        "type": "integer"
+      },
+      "location": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Location"
+      },
+      "material_path": {
+        "default": "",
+        "title": "Material Path",
+        "type": "string"
+      },
+      "section_size": {
+        "default": 63,
+        "title": "Section Size",
+        "type": "integer"
+      },
+      "sections_per_component": {
+        "default": 1,
+        "title": "Sections Per Component",
+        "type": "integer"
+      }
+    },
+    "title": "vail_landscape_createArguments",
+    "type": "object"
+  }
+}

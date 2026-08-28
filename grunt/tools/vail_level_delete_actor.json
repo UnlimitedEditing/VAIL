@@ -1,0 +1,17 @@
+{
+  "name": "vail_level_delete_actor",
+  "description": "Safely removes an actor from the active level within an Undo transaction.\n\nArgs:\n    actor_id: Actor label, name, or path in the current world.",
+  "parameters": {
+    "properties": {
+      "actor_id": {
+        "title": "Actor Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "actor_id"
+    ],
+    "title": "vail_level_delete_actorArguments",
+    "type": "object"
+  }
+}

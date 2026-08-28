@@ -1,0 +1,32 @@
+{
+  "name": "vail_sequencer_add_track",
+  "description": "Adds a track binding to a LevelSequence asset.\n\nArgs:\n    sequence_path: Path to LevelSequence asset.\n    track_type: Track type identifier ('Transform', 'Property', 'Audio', 'CameraCut', 'SkeletalAnimation', 'Fade', 'Event').\n    target_object: Actor label, component path, or binding ID.\n    property_path: Property path for Property tracks (e.g. 'Intensity', 'LightColor', 'CurrentFocalLength').",
+  "parameters": {
+    "properties": {
+      "property_path": {
+        "default": "",
+        "title": "Property Path",
+        "type": "string"
+      },
+      "sequence_path": {
+        "title": "Sequence Path",
+        "type": "string"
+      },
+      "target_object": {
+        "default": "",
+        "title": "Target Object",
+        "type": "string"
+      },
+      "track_type": {
+        "title": "Track Type",
+        "type": "string"
+      }
+    },
+    "required": [
+      "sequence_path",
+      "track_type"
+    ],
+    "title": "vail_sequencer_add_trackArguments",
+    "type": "object"
+  }
+}

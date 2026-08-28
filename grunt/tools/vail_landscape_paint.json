@@ -1,0 +1,31 @@
+{
+  "name": "vail_landscape_paint",
+  "description": "Paints landscape layer weightmaps onto terrain.\n\nArgs:\n    layer_name: Target landscape layer name (e.g. 'Grass', 'Rock', 'Mud', 'Snow').\n    target_location: World target hit point [X, Y, Z].\n    radius: Brush radius (default: 1024.0).\n    strength: Paint weight strength (default: 1.0).",
+  "parameters": {
+    "properties": {
+      "layer_name": {
+        "title": "Layer Name",
+        "type": "string"
+      },
+      "radius": {
+        "default": 1024.0,
+        "title": "Radius",
+        "type": "number"
+      },
+      "strength": {
+        "default": 1.0,
+        "title": "Strength",
+        "type": "number"
+      },
+      "target_location": {
+        "title": "Target Location"
+      }
+    },
+    "required": [
+      "layer_name",
+      "target_location"
+    ],
+    "title": "vail_landscape_paintArguments",
+    "type": "object"
+  }
+}

@@ -7,11 +7,16 @@
 #include "Factories/MaterialFactoryNew.h"
 #include "Factories/MaterialInstanceConstantFactoryNew.h"
 #include "Materials/MaterialInstanceConstant.h"
+#include "FileHelpers.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Pawn.h"
 #include "UObject/Package.h"
+#include "WidgetBlueprint.h"
+#include "WidgetBlueprintFactory.h"
+#include "Blueprint/WidgetTree.h"
+#include "Components/CanvasPanel.h"
 
 FVAILAssetManager& FVAILAssetManager::Get()
 {
@@ -154,6 +159,43 @@ bool FVAILAssetManager::CreateAsset(
 		return true;
 	}
 
+	// 4. Create Widget Blueprint (UMG)
+	if (AssetClass.Equals(TEXT("WidgetBlueprint"), ESearchCase::IgnoreCase) ||
+		AssetClass.Equals(TEXT("Widget"), ESearchCase::IgnoreCase) ||
+		AssetClass.Equals(TEXT("WBP"), ESearchCase::IgnoreCase))
+	{
+		UWidgetBlueprintFactory* Factory = NewObject<UWidgetBlueprintFactory>();
+		UObject* NewWidget = AssetTools.CreateAsset(
+			AssetName,
+			PackageName,
+			UWidgetBlueprint::StaticClass(),
+			Factory
+		);
+
+		UWidgetBlueprint* NewWidgetBP = Cast<UWidgetBlueprint>(NewWidget);
+		if (!NewWidgetBP)
+		{
+			ErrorMessage = FString::Printf(TEXT("Failed to create WidgetBlueprint at '%s/%s'"), *PackageName, *AssetName);
+			return false;
+		}
+
+		// UWidgetBlueprintFactory normally seeds a root CanvasPanel itself, but
+		// guarantee it here too -- vail_widget_add_element needs a root panel
+		// to parent onto, and a widget tree with no root would silently break
+		// every widget tool downstream of this one.
+		if (!NewWidgetBP->WidgetTree->RootWidget)
+		{
+			UCanvasPanel* RootCanvas = NewWidgetBP->WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("RootCanvas"));
+			NewWidgetBP->WidgetTree->RootWidget = RootCanvas;
+		}
+
+		FKismetEditorUtilities::CompileBlueprint(NewWidgetBP);
+		FAssetRegistryModule::AssetCreated(NewWidgetBP);
+		NewWidgetBP->MarkPackageDirty();
+		OutAsset = NewWidgetBP;
+		return true;
+	}
+
 	ErrorMessage = FString::Printf(TEXT("Asset class '%s' is not supported for automated creation"), *AssetClass);
 	return false;
 }
@@ -210,20 +252,61 @@ bool FVAILAssetManager::QueryAssets(
 		Filter.bRecursivePaths = true;
 	}
 
-	if (!ClassFilter.IsEmpty())
-	{
-		Filter.ClassPaths.Add(FTopLevelAssetPath(TEXT("/Script/Engine"), FName(*ClassFilter)));
-	}
-
 	AssetRegistryModule.Get().GetAssets(Filter, AssetDataList);
+
+	FString ClassFilterLower = ClassFilter.ToLower();
 
 	for (const FAssetData& Data : AssetDataList)
 	{
+		FString AssetClassName = Data.AssetClassPath.GetAssetName().ToString();
+		if (!ClassFilterLower.IsEmpty() && !AssetClassName.ToLower().Equals(ClassFilterLower))
+		{
+			continue;
+		}
+
 		FVAILAssetInfo Info;
 		Info.AssetName = Data.AssetName.ToString();
 		Info.PackagePath = Data.PackagePath.ToString();
-		Info.AssetClass = Data.AssetClassPath.GetAssetName().ToString();
+		Info.AssetClass = AssetClassName;
 		OutAssets.Add(Info);
+	}
+
+	return true;
+}
+
+bool FVAILAssetManager::SaveAsset(
+	const FString& AssetPath,
+	FString& ErrorMessage)
+{
+	UPackage* PackageToSave = nullptr;
+	if (UObject* TargetObject = LoadObject<UObject>(nullptr, *AssetPath))
+	{
+		PackageToSave = TargetObject->GetOutermost();
+	}
+	else
+	{
+		PackageToSave = FindPackage(nullptr, *AssetPath);
+	}
+
+	if (!PackageToSave)
+	{
+		ErrorMessage = FString::Printf(TEXT("Could not find package for '%s'"), *AssetPath);
+		return false;
+	}
+
+	TArray<UPackage*> PackagesToSave;
+	PackagesToSave.Add(PackageToSave);
+
+	FEditorFileUtils::EPromptReturnCode ReturnCode = FEditorFileUtils::PromptForCheckoutAndSave(
+		PackagesToSave,
+		false, // bCheckDirty
+		false  // bPromptToSave
+	);
+
+	if (ReturnCode != FEditorFileUtils::PR_Success)
+	{
+		ErrorMessage = FString::Printf(TEXT("Failed to save package '%s'"), *AssetPath);
+		return false;
 	}
 
 	return true;

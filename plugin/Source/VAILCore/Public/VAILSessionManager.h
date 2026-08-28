@@ -33,6 +33,9 @@ public:
 	/** Begin a compound transaction batch */
 	bool BeginBatch(const FString& BatchTitle, FString& OutErrorMessage);
 
+	/** Check if an active compound transaction batch is currently open */
+	bool IsInBatch() const { return ActiveBatchTransaction.IsValid(); }
+
 	/** End and commit active compound transaction batch */
 	bool EndBatch(FString& OutErrorMessage);
 

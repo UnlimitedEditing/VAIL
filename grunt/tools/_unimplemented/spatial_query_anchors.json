@@ -1,0 +1,33 @@
+{
+  "name": "spatial_query_anchors",
+  "description": "Inspects geometric context, bounds, surface normals, and available sockets on target actors or zones.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "target_actor": {
+        "type": "string",
+        "description": "Actor label or name in the level to inspect (e.g. 'Floor_0', 'Corridor_DoorL', 'Cargo_WallA')"
+      },
+      "surface_type": {
+        "type": "string",
+        "enum": [
+          "all",
+          "floor",
+          "wall",
+          "ceiling",
+          "socket"
+        ],
+        "default": "all",
+        "description": "Filter for specific surface orientations or sockets"
+      },
+      "tag_filter": {
+        "type": "string",
+        "default": "",
+        "description": "Optional tag filter for reference points"
+      }
+    },
+    "required": [
+      "target_actor"
+    ]
+  }
+}

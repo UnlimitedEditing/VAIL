@@ -1,0 +1,17 @@
+{
+  "name": "vail_sequencer_query",
+  "description": "Inspects all tracks, bindings, sections, and keyframe ranges of a LevelSequence asset.\n\nArgs:\n    sequence_path: Path to LevelSequence asset (e.g. '/Game/Cinematics/LS_IntroCutscene').",
+  "parameters": {
+    "properties": {
+      "sequence_path": {
+        "title": "Sequence Path",
+        "type": "string"
+      }
+    },
+    "required": [
+      "sequence_path"
+    ],
+    "title": "vail_sequencer_queryArguments",
+    "type": "object"
+  }
+}

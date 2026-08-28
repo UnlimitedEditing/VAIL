@@ -1,0 +1,36 @@
+{
+  "name": "vail_landscape_sculpt",
+  "description": "Applies a sculpting brush mutation to the landscape heightmap.\n\nArgs:\n    target_location: World target hit point as [X, Y, Z].\n    brush_mode: Sculpting mode ('Sculpt', 'Smooth', 'Flatten', 'Ramp', 'Erosion').\n    radius: Brush radius in Unreal units (default: 2048.0).\n    falloff: Falloff factor between 0.0 and 1.0 (default: 0.5).\n    strength: Delta height intensity (default: 0.3).",
+  "parameters": {
+    "properties": {
+      "brush_mode": {
+        "default": "Sculpt",
+        "title": "Brush Mode",
+        "type": "string"
+      },
+      "falloff": {
+        "default": 0.5,
+        "title": "Falloff",
+        "type": "number"
+      },
+      "radius": {
+        "default": 2048.0,
+        "title": "Radius",
+        "type": "number"
+      },
+      "strength": {
+        "default": 0.3,
+        "title": "Strength",
+        "type": "number"
+      },
+      "target_location": {
+        "title": "Target Location"
+      }
+    },
+    "required": [
+      "target_location"
+    ],
+    "title": "vail_landscape_sculptArguments",
+    "type": "object"
+  }
+}

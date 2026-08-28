@@ -1,0 +1,52 @@
+{
+  "name": "spatial_align_and_distribute",
+  "description": "Aligns, evenly spaces, or snaps existing actors in the world to reference planes or axes.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "targets": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of actor IDs or wildcard pattern to align"
+      },
+      "mode": {
+        "type": "string",
+        "enum": [
+          "even_spacing",
+          "center_on_anchor",
+          "snap_to_ground",
+          "align_flush",
+          "match_rotation"
+        ],
+        "description": "Alignment or distribution mode"
+      },
+      "reference_anchor": {
+        "type": "string",
+        "default": "",
+        "description": "Reference actor or plane to align against"
+      },
+      "axis": {
+        "type": "string",
+        "enum": [
+          "X",
+          "Y",
+          "Z",
+          "All"
+        ],
+        "default": "X",
+        "description": "Primary axis for alignment or distribution"
+      },
+      "spacing": {
+        "type": "number",
+        "default": 0.0,
+        "description": "Spacing distance for even distribution"
+      }
+    },
+    "required": [
+      "targets",
+      "mode"
+    ]
+  }
+}

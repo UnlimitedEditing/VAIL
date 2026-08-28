@@ -1,0 +1,32 @@
+{
+  "name": "vail_widget_bind_event",
+  "description": "Binds an interactive widget delegate event to a Blueprint graph handler.\n\nArgs:\n    widget_path: Path to Widget Blueprint asset.\n    element_name: Widget component variable name.\n    event_name: Delegate event name ('OnClicked', 'OnHovered', 'OnUnhovered', 'OnPressed', 'OnReleased', 'OnValueChanged').\n    function_name: Optional handler function name or auto-created event node.",
+  "parameters": {
+    "properties": {
+      "element_name": {
+        "title": "Element Name",
+        "type": "string"
+      },
+      "event_name": {
+        "default": "OnClicked",
+        "title": "Event Name",
+        "type": "string"
+      },
+      "function_name": {
+        "default": "",
+        "title": "Function Name",
+        "type": "string"
+      },
+      "widget_path": {
+        "title": "Widget Path",
+        "type": "string"
+      }
+    },
+    "required": [
+      "widget_path",
+      "element_name"
+    ],
+    "title": "vail_widget_bind_eventArguments",
+    "type": "object"
+  }
+}

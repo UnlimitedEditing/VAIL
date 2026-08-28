@@ -1,0 +1,48 @@
+{
+  "name": "spatial_generate_pattern",
+  "description": "Generates structured architectural repetition or organic clutter using procedural spatial distributions.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "asset": {
+        "type": "string",
+        "description": "Asset archetype or blueprint class to replicate"
+      },
+      "pattern": {
+        "type": "string",
+        "enum": [
+          "linear_array",
+          "radial_ring",
+          "poisson_scatter",
+          "grid_tile",
+          "perimeter_border"
+        ],
+        "description": "Distribution pattern type"
+      },
+      "bounds_actor": {
+        "type": "string",
+        "description": "Reference actor or volume defining placement boundary (e.g. 'Cargo_FloorA', 'Corridor_Room')"
+      },
+      "count": {
+        "type": "integer",
+        "description": "Number of instances to generate"
+      },
+      "spacing": {
+        "type": "number",
+        "default": 100.0,
+        "description": "Distance interval between elements in centimeters"
+      },
+      "folder_path": {
+        "type": "string",
+        "default": "Procedural",
+        "description": "Outliner folder path for grouped instances"
+      }
+    },
+    "required": [
+      "asset",
+      "pattern",
+      "bounds_actor",
+      "count"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "vail_control_rig_query",
+  "description": "Queries the hierarchy of controls, bones, and limits for a Control Rig.\n\nArgs:\n    rig_path: Control Rig asset path or actor name.",
+  "parameters": {
+    "properties": {
+      "rig_path": {
+        "title": "Rig Path",
+        "type": "string"
+      }
+    },
+    "required": [
+      "rig_path"
+    ],
+    "title": "vail_control_rig_queryArguments",
+    "type": "object"
+  }
+}

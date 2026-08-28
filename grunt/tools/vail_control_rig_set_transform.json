@@ -1,0 +1,58 @@
+{
+  "name": "vail_control_rig_set_transform",
+  "description": "Sets a target transform on a Control Rig bone or control solver goal.\n\nArgs:\n    rig_path: Control Rig asset path or SkeletalMeshComponent.\n    control_name: Control bone name (e.g. 'hand_r_ctrl', 'head_ctrl', 'pelvis_ctrl').\n    location: Target location [X, Y, Z].\n    rotation: Target rotation [Pitch, Yaw, Roll].",
+  "parameters": {
+    "properties": {
+      "control_name": {
+        "title": "Control Name",
+        "type": "string"
+      },
+      "location": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Location"
+      },
+      "rig_path": {
+        "title": "Rig Path",
+        "type": "string"
+      },
+      "rotation": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Rotation"
+      }
+    },
+    "required": [
+      "rig_path",
+      "control_name"
+    ],
+    "title": "vail_control_rig_set_transformArguments",
+    "type": "object"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "name": "vail_level_spawn_actor",
+  "description": "Spawns an actor into the active level viewport headlessly with transform and outliner placement.\n\nArgs:\n    asset_path: Asset to place (e.g. '/Game/Meshes/SM_Pillar', '/Game/Blueprints/BP_Door') or native class name ('PointLight', 'DirectionalLight', 'StaticMeshActor').\n    actor_label: Human-readable label in the World Outliner.\n    location: World coordinates as [X, Y, Z] list or {'X': 0, 'Y': 0, 'Z': 0} dict (default: [0, 0, 0]).\n    rotation: Euler angles as [Pitch, Yaw, Roll] list or {'Pitch': 0, 'Yaw': 0, 'Roll': 0} dict (default: [0, 0, 0]).\n    scale: Scale as [ScaleX, ScaleY, ScaleZ] list or {'X': 1, 'Y': 1, 'Z': 1} dict (default: [1, 1, 1]).\n    folder_path: Outliner folder path for organization (e.g. 'Lighting/Exterior').\n    parent_actor: Label or ID of actor to attach to.",
+  "parameters": {
+    "properties": {
+      "actor_label": {
+        "default": "",
+        "title": "Actor Label",
+        "type": "string"
+      },
+      "asset_path": {
+        "title": "Asset Path",
+        "type": "string"
+      },
+      "folder_path": {
+        "default": "",
+        "title": "Folder Path",
+        "type": "string"
+      },
+      "location": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Location"
+      },
+      "parent_actor": {
+        "default": "",
+        "title": "Parent Actor",
+        "type": "string"
+      },
+      "rotation": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Rotation"
+      },
+      "scale": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Scale"
+      }
+    },
+    "required": [
+      "asset_path"
+    ],
+    "title": "vail_level_spawn_actorArguments",
+    "type": "object"
+  }
+}

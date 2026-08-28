@@ -1,0 +1,51 @@
+{
+  "name": "vail_foliage_scatter",
+  "description": "Procedurally scatters instanced static mesh foliage within an area.\n\nArgs:\n    mesh_path: StaticMesh asset path to instance (e.g. '/Game/Environment/Trees/SM_PineTree').\n    center_location: Center point coordinates [X, Y, Z].\n    radius: Scatter radius (default: 3000.0).\n    density: Number of instances to scatter (default: 50).\n    scale_min: Minimum random scale factor (default: 0.8).\n    scale_max: Maximum random scale factor (default: 1.2).\n    align_to_normal: Align instance up-vector to terrain surface normal (default: True).\n    random_yaw: Apply random 360-degree yaw rotation (default: True).",
+  "parameters": {
+    "properties": {
+      "align_to_normal": {
+        "default": true,
+        "title": "Align To Normal",
+        "type": "boolean"
+      },
+      "center_location": {
+        "title": "Center Location"
+      },
+      "density": {
+        "default": 50,
+        "title": "Density",
+        "type": "integer"
+      },
+      "mesh_path": {
+        "title": "Mesh Path",
+        "type": "string"
+      },
+      "radius": {
+        "default": 3000.0,
+        "title": "Radius",
+        "type": "number"
+      },
+      "random_yaw": {
+        "default": true,
+        "title": "Random Yaw",
+        "type": "boolean"
+      },
+      "scale_max": {
+        "default": 1.2,
+        "title": "Scale Max",
+        "type": "number"
+      },
+      "scale_min": {
+        "default": 0.8,
+        "title": "Scale Min",
+        "type": "number"
+      }
+    },
+    "required": [
+      "mesh_path",
+      "center_location"
+    ],
+    "title": "vail_foliage_scatterArguments",
+    "type": "object"
+  }
+}

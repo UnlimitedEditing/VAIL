@@ -1,0 +1,45 @@
+{
+  "name": "vail_audio_play",
+  "description": "Auditions or triggers a SoundCue, SoundWave, or MetaSound asset.\n\nArgs:\n    sound_path: Audio asset path (e.g. '/Game/Audio/MS_Ambience_Forest').\n    location: Optional 3D world location [X, Y, Z]. If omitted, plays 2D.\n    volume_multiplier: Volume multiplier (default: 1.0).\n    pitch_multiplier: Pitch multiplier (default: 1.0).",
+  "parameters": {
+    "properties": {
+      "location": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Location"
+      },
+      "pitch_multiplier": {
+        "default": 1.0,
+        "title": "Pitch Multiplier",
+        "type": "number"
+      },
+      "sound_path": {
+        "title": "Sound Path",
+        "type": "string"
+      },
+      "volume_multiplier": {
+        "default": 1.0,
+        "title": "Volume Multiplier",
+        "type": "number"
+      }
+    },
+    "required": [
+      "sound_path"
+    ],
+    "title": "vail_audio_playArguments",
+    "type": "object"
+  }
+}
