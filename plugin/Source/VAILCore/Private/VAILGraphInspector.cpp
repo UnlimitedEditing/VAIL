@@ -3,6 +3,13 @@
 #include "VAILGraphInspector.h"
 #include "K2Node_CallFunction.h"
 #include "K2Node_Event.h"
+#include "K2Node_InputAxisEvent.h"
+#include "K2Node_EnhancedInputAction.h"
+#include "InputAction.h"
+#include "K2Node_CustomEvent.h"
+#include "BlueprintNodeSpawner.h"
+#include "BlueprintNodeBinder.h"
+#include "K2Node_DynamicCast.h"
 #include "K2Node_VariableGet.h"
 #include "K2Node_VariableSet.h"
 #include "K2Node_IfThenElse.h"
@@ -329,6 +336,168 @@ bool FVAILGraphInspector::SpawnNode(
 			return true;
 		}
 
+		// Handle legacy InputAxis Event Node (e.g. "InputAxis:MoveForward") -- the axis name
+		// must be set BEFORE AllocateDefaultPins() runs, which the generic K2Node spawn path
+		// below can't do (it has no hook to configure a node before pin allocation).
+		if (NodeType.StartsWith(TEXT("InputAxis:")))
+		{
+			FString AxisName = NodeType.Mid(10);
+			UK2Node_InputAxisEvent* AxisEventNode = NewObject<UK2Node_InputAxisEvent>(Graph);
+			AxisEventNode->InputAxisName = FName(*AxisName);
+			AxisEventNode->CreateNewGuid();
+			AxisEventNode->PostPlacedNewNode();
+			AxisEventNode->NodePosX = Position.X;
+			AxisEventNode->NodePosY = Position.Y;
+			AxisEventNode->AllocateDefaultPins();
+			Graph->AddNode(AxisEventNode, true, false);
+
+			OutNodeId = AxisEventNode->NodeGuid.ToString();
+			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+			return true;
+		}
+
+		// Handle Custom Event Node (e.g. "CustomEvent:OnWaveTimer") -- an independent,
+		// arbitrarily-named event with no engine override binding, callable by name from
+		// K2_SetTimer/K2_SetTimerForNextTick or any other FunctionName-string API.
+		if (NodeType.StartsWith(TEXT("CustomEvent:")))
+		{
+			FString EventName = NodeType.Mid(12);
+			UK2Node_CustomEvent* CustomEventNode = NewObject<UK2Node_CustomEvent>(Graph);
+			CustomEventNode->CustomFunctionName = FName(*EventName);
+			CustomEventNode->CreateNewGuid();
+			CustomEventNode->PostPlacedNewNode();
+			CustomEventNode->NodePosX = Position.X;
+			CustomEventNode->NodePosY = Position.Y;
+			CustomEventNode->AllocateDefaultPins();
+			Graph->AddNode(CustomEventNode, true, false);
+
+			OutNodeId = CustomEventNode->NodeGuid.ToString();
+			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+			return true;
+		}
+
+		// Handle Enhanced Input Action Event Node (e.g. "EnhancedInputAction:/Game/Input/IA_Move")
+		// -- InputAction must be set BEFORE AllocateDefaultPins(), same reason as InputAxis above;
+		// the node's Triggered/Started/Completed pins and the ActionValue pin's type (bool/
+		// Axis1D/Axis2D/Axis3D) are derived from the action asset at pin-allocation time.
+		if (NodeType.StartsWith(TEXT("EnhancedInputAction:")))
+		{
+			FString ActionAssetPath = NodeType.Mid(20);
+			UInputAction* Action = LoadObject<UInputAction>(nullptr, *ActionAssetPath);
+			if (!Action)
+			{
+				ErrorMessage = FString::Printf(TEXT("Could not load InputAction at '%s'"), *ActionAssetPath);
+				return false;
+			}
+
+			UK2Node_EnhancedInputAction* ActionEventNode = NewObject<UK2Node_EnhancedInputAction>(Graph);
+			ActionEventNode->InputAction = Action;
+			ActionEventNode->CreateNewGuid();
+			ActionEventNode->PostPlacedNewNode();
+			ActionEventNode->NodePosX = Position.X;
+			ActionEventNode->NodePosY = Position.Y;
+			ActionEventNode->AllocateDefaultPins();
+			Graph->AddNode(ActionEventNode, true, false);
+			ActionEventNode->ReconstructNode();
+
+			OutNodeId = ActionEventNode->NodeGuid.ToString();
+			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+			return true;
+		}
+
+		// Handle Variable Get/Set (e.g. "VariableGet:Health" for a self-context member, or
+		// "VariableGet:/Game/Blueprints/BP_Player::Health" for an external class's member --
+		// the latter gets a "Target" input pin of that class automatically once
+		// VariableReference is configured, same mechanism as Event:'s EventReference.
+		if (NodeType.StartsWith(TEXT("VariableGet:")) || NodeType.StartsWith(TEXT("VariableSet:")))
+		{
+			const bool bIsGet = NodeType.StartsWith(TEXT("VariableGet:"));
+			FString VarSpec = NodeType.Mid(bIsGet ? 12 : 12);
+			FString ExternalBPPath, VarName;
+
+			UK2Node_Variable* VarNode = nullptr;
+			if (bIsGet)
+			{
+				VarNode = NewObject<UK2Node_VariableGet>(Graph);
+			}
+			else
+			{
+				VarNode = NewObject<UK2Node_VariableSet>(Graph);
+			}
+
+			if (VarSpec.Split(TEXT("::"), &ExternalBPPath, &VarName))
+			{
+				// First try a Blueprint asset path (e.g. "/Game/Blueprints/BP_Player"), then
+				// fall back to a native engine class by short name (e.g. "CharacterMovementComponent")
+				// -- same two-path resolution as the native-class Class-pin fix, needed for
+				// reading BlueprintReadOnly properties on native components like
+				// CharacterMovementComponent::MovementMode.
+				UClass* ExternalClass = nullptr;
+				if (UBlueprint* ExternalBP = LoadObject<UBlueprint>(nullptr, *ExternalBPPath))
+				{
+					ExternalClass = ExternalBP->GeneratedClass;
+				}
+				if (!ExternalClass)
+				{
+					for (TObjectIterator<UClass> It; It; ++It)
+					{
+						if (It->GetName().Equals(ExternalBPPath, ESearchCase::IgnoreCase))
+						{
+							ExternalClass = *It;
+							break;
+						}
+					}
+				}
+				if (!ExternalClass)
+				{
+					ErrorMessage = FString::Printf(TEXT("Could not resolve Blueprint or native class '%s'"), *ExternalBPPath);
+					return false;
+				}
+				VarNode->VariableReference.SetExternalMember(FName(*VarName), ExternalClass);
+			}
+			else
+			{
+				VarNode->VariableReference.SetSelfMember(FName(*VarSpec));
+			}
+
+			VarNode->CreateNewGuid();
+			VarNode->PostPlacedNewNode();
+			VarNode->NodePosX = Position.X;
+			VarNode->NodePosY = Position.Y;
+			VarNode->AllocateDefaultPins();
+			Graph->AddNode(VarNode, true, false);
+
+			OutNodeId = VarNode->NodeGuid.ToString();
+			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+			return true;
+		}
+
+		// Handle Dynamic Cast (e.g. "DynamicCast:/Game/Blueprints/BP_Player") -- TargetType
+		// must be set before AllocateDefaultPins, same reason as InputAxis/EnhancedInputAction.
+		if (NodeType.StartsWith(TEXT("DynamicCast:")))
+		{
+			FString TargetBPPath = NodeType.Mid(12);
+			UBlueprint* TargetBP = LoadObject<UBlueprint>(nullptr, *TargetBPPath);
+			if (!TargetBP || !TargetBP->GeneratedClass)
+			{
+				ErrorMessage = FString::Printf(TEXT("Could not load Blueprint at '%s'"), *TargetBPPath);
+				return false;
+			}
+
+			UK2Node_DynamicCast* CastNode = NewObject<UK2Node_DynamicCast>(Graph);
+			CastNode->TargetType = TargetBP->GeneratedClass;
+			CastNode->CreateNewGuid();
+			CastNode->PostPlacedNewNode();
+			CastNode->NodePosX = Position.X;
+			CastNode->NodePosY = Position.Y;
+			CastNode->AllocateDefaultPins();
+			Graph->AddNode(CastNode, true, false);
+
+			OutNodeId = CastNode->NodeGuid.ToString();
+			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+			return true;
+		}
+
 		// Generic K2Node Class Spawn
 		UClass* NodeClass = nullptr;
 		for (TObjectIterator<UClass> It; It; ++It)
@@ -344,13 +513,28 @@ bool FVAILGraphInspector::SpawnNode(
 
 		if (NodeClass)
 		{
-			UK2Node* NewNode = NewObject<UK2Node>(Graph, NodeClass);
-			NewNode->CreateNewGuid();
-			NewNode->PostPlacedNewNode();
-			NewNode->NodePosX = Position.X;
-			NewNode->NodePosY = Position.Y;
-			NewNode->AllocateDefaultPins();
-			Graph->AddNode(NewNode, true, false);
+			// Some K2Node subclasses (confirmed crash: K2Node_SpawnActorFromClass, whose
+			// AllocateDefaultPins() calls a private FixupScaleMethodPin() that hard-crashes
+			// via FindPinChecked -- check(), not a recoverable ensure()) need setup this
+			// generic path can't know about ahead of time, and reordering AddNode vs
+			// AllocateDefaultPins alone did NOT fix it. Route through UBlueprintNodeSpawner
+			// instead -- the same code path the Blueprint editor's own right-click "Add
+			// Node" menu uses -- so whatever per-node-type setup is needed happens exactly
+			// the way Epic's own tooling does it, for any K2Node subclass, not just the
+			// ones we've hand-special-cased above.
+			UBlueprintNodeSpawner* Spawner = UBlueprintNodeSpawner::Create(NodeClass);
+			if (!Spawner)
+			{
+				ErrorMessage = FString::Printf(TEXT("Failed to create a node spawner for class '%s'"), *NodeType);
+				return false;
+			}
+
+			UEdGraphNode* NewNode = Spawner->Invoke(Graph, IBlueprintNodeBinder::FBindingSet(), Position);
+			if (!NewNode)
+			{
+				ErrorMessage = FString::Printf(TEXT("Node spawner produced no node for class '%s'"), *NodeType);
+				return false;
+			}
 
 			OutNodeId = NewNode->NodeGuid.ToString();
 			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
@@ -556,6 +740,32 @@ bool FVAILGraphInspector::SetPinDefaultValue(
 	}
 
 	Graph->GetSchema()->TrySetDefaultValue(*Pin, Value);
+
+	// TrySetDefaultValue (string-based) works for Blueprint-asset-path class references
+	// (e.g. "/Game/Blueprints/BP_Player.BP_Player_C" -- confirmed working live this session
+	// for SpawnActorFromClass/CreateWidget's Class pins) but silently no-ops for native
+	// engine classes (e.g. "/Script/GeometryScriptingCore.DynamicMesh") -- PC_Class pins are
+	// documented (EdGraphSchema_K2.h) to want DefaultObject, not the DefaultValue string.
+	// Fall back to resolving the class and setting DefaultObject directly when that happens.
+	if (Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Class && !Pin->DefaultObject && !Value.IsEmpty())
+	{
+		UClass* ResolvedClass = LoadObject<UClass>(nullptr, *Value);
+		if (!ResolvedClass)
+		{
+			for (TObjectIterator<UClass> It; It; ++It)
+			{
+				if (It->GetName().Equals(Value, ESearchCase::IgnoreCase))
+				{
+					ResolvedClass = *It;
+					break;
+				}
+			}
+		}
+		if (ResolvedClass)
+		{
+			Graph->GetSchema()->TrySetDefaultObject(*Pin, ResolvedClass);
+		}
+	}
 
 	if (UBlueprint* Blueprint = Cast<UBlueprint>(AssetObject))
 	{

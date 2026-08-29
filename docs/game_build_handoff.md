@@ -48,12 +48,50 @@ checking engine-side state, not just trusting their JSON response.
 `vail_set_scope`, `vail_get_tree`, `vail_find`, `vail_set_property`, `vail_wait_for`,
 `vail_execute_command`, `vail_begin_batch`, `vail_end_batch`, `vail_graph_get_topology`,
 `vail_graph_add_node`, `vail_graph_connect_pins`, `vail_graph_delete_node`, `vail_asset_create`
-(supports `Blueprint`/`BP`, `Material`/`M`, `MaterialInstance`/`MI`, `WidgetBlueprint`/`Widget`/`WBP`
-— nothing else), `vail_asset_query`, `vail_asset_save`, `vail_level_spawn_actor`,
-`vail_level_delete_actor`, `vail_level_query_actors`, `vail_viewport_frame`,
-`vail_widget_tree_get`, `vail_widget_add_element` (Button/TextBlock/Image/ProgressBar/Border/
-Overlay/CanvasPanel/VerticalBox/HorizontalBox only), `vail_widget_set_slot` (CanvasPanelSlot,
-HorizontalBoxSlot, VerticalBoxSlot), `vail_widget_bind_event`, `vail_audio_play`.
+(supports `Blueprint`/`BP`, `Material`/`M`, `MaterialInstance`/`MI`, `WidgetBlueprint`/`Widget`/`WBP`,
+`InputAction`, `InputMappingContext` — nothing else), `vail_asset_query`, `vail_asset_save`,
+`vail_level_spawn_actor`, `vail_level_delete_actor`, `vail_level_query_actors`,
+`vail_viewport_frame`, `vail_widget_tree_get`, `vail_widget_add_element` (Button/TextBlock/
+Image/ProgressBar/Border/Overlay/CanvasPanel/VerticalBox/HorizontalBox only),
+`vail_widget_set_slot` (CanvasPanelSlot, HorizontalBoxSlot, VerticalBoxSlot),
+`vail_widget_bind_event`, `vail_audio_play`.
+
+**Added and proven during the BP_Player build (2026-08-28/29 session), not in VAIL's
+original tool set:**
+- `vail_component_add(asset_path, component_class, component_name, parent_component, attach_socket)`
+  — adds a component to a Blueprint's Components tree headlessly, including attaching under
+  an inherited native parent (e.g. Character's Capsule root) and at a named socket (e.g. a
+  SpringArm's `SpringEndpoint` — **required** for a Camera child, otherwise it sits at the
+  boom's origin, not its end).
+- `vail_component_remove(asset_path, component_name)`.
+- `vail_variable_add(asset_path, var_name, var_type, default_value)` — `var_type` one of
+  `Float`, `Int`, `Bool`, `String`, `Vector`.
+- `vail_input_map_key(context_asset_path, action_asset_path, key_name, modifiers)` —
+  modifiers: `Negate`, `SwizzleYXZ` (the WASD-to-2D-axis trick).
+- `vail_graph_set_pin_default(pin_spec, value, asset_path, graph_name)` — was already
+  implemented server-side, just never wired to a command until now.
+- `vail_plugin_version()` — call after any restart/Live Coding attempt to confirm new code
+  is actually running; don't reason from DLL/source timestamps.
+- `vail_graph_add_node` `node_type` grammar gained: `InputAxis:<AxisName>` (legacy — likely
+  non-functional on its own in 5.8, Enhanced Input mappings don't fire it; kept for other
+  uses), `EnhancedInputAction:<InputActionAssetPath>`, `CustomEvent:<EventName>`. The
+  **generic K2Node class-spawn fallback** (any `node_type` not matching a special-cased
+  prefix) now routes through `UBlueprintNodeSpawner`, not a raw `NewObject`+
+  `AllocateDefaultPins` — the old version hard-crashed the editor on
+  `K2Node_SpawnActorFromClass`. `SpawnActorFromClass` itself is now confirmed working
+  through this path.
+- `vail_set_scope` target syntax gained `<BlueprintAssetPath>::<ComponentName>` (resolves an
+  SCS component's template, including inherited-native ones by class-name fallback — e.g.
+  `::CharacterMovement` resolves the native `CharMoveComp`) and `<BlueprintAssetPath>::Self`
+  / `::CDO` (resolves the Blueprint's class-default-object for actor-level defaults like
+  `bUseControllerRotationYaw`).
+- Movement input requires Enhanced Input, not legacy Axis Mappings (5.8 shows a "deprecated"
+  banner for Axis/Action Mappings in Project Settings and they did not fire `InputAxis`
+  Blueprint events in testing). Runtime-callable Blueprint function libraries (e.g. one that
+  activates an Input Mapping Context) **must live in a `Type: Runtime` plugin module** — a
+  `Type: Editor` module's `UFUNCTION`s are rejected by the Blueprint compiler when called
+  from a gameplay Blueprint ("Cannot use the editor function ... in this runtime
+  Blueprint"). See `VAILRuntime` module, added this session for exactly this.
 
 **Still fake — do not use, they silently return plausible-looking fabricated data with no
 engine effect:** `vail_sequencer_query/add_track/add_key`, `vail_landscape_create/sculpt/paint`,
@@ -62,9 +100,40 @@ engine effect:** `vail_sequencer_query/add_track/add_key`, `vail_landscape_creat
 `Status: Parked` in `docs/sensory_validation_critic_handoff.md` — deliberately deferred design
 work, not a bug).
 
+## Tier 3 target: procedural geometry (Geometry Script) — researched, not yet built
+
+Jacob's actual goal past this game-build slice is **procedural geometry**, not just materials —
+see the tiered roadmap: Tier 1 materials/shaders, Tier 2 Niagara VFX, **Tier 3 procedural
+geometry (the real target)**, Tier 4 real meshes (spun off as a separate future "VAIL for
+Blender" project, out of scope here). Researched this session (2026-08-29), not yet
+implemented or tested live:
+
+- **`GeometryScriptingCore`** (Engine plugin, `Type: Runtime` — works in packaged builds, not
+  editor-only) exposes `UGeometryScriptLibrary_MeshPrimitiveFunctions` with dozens of plain
+  `BlueprintCallable` static functions — `AppendBox`, `AppendSphere`, `AppendCapsule`,
+  `AppendCone`, boolean ops, etc. Each takes a `UDynamicMesh*` and returns the same one
+  (`ScriptMethod` meta = chainable in the Blueprint graph), so this is directly reachable
+  through VAIL's **already-proven, already-working** `CallFunction:` node type — no new VAIL
+  C++ needed for the geometry-generation calls themselves.
+- **`UDynamicMeshComponent`** (`Engine/Source/Runtime/GeometryFramework`, a core engine
+  runtime module, not a plugin) is the component that renders a `UDynamicMesh`. Its
+  `GetDynamicMesh()` is NOT Blueprint-callable (commented-out `UFUNCTION` in the header) --
+  don't try to call it via `CallFunction:`. The real write path is
+  `SetDynamicMesh(UDynamicMesh* NewMesh)`, which **is** `BlueprintCallable`.
+- Expected pattern once implemented: create a blank `UDynamicMesh` (via a GeometryScript
+  "Create New Mesh" helper -- not yet located exactly, check
+  `UGeometryScriptLibrary_CreateNewMeshFunctions` or similar in
+  `MeshPrimitiveFunctions.h`'s neighboring headers first) -> chain `AppendBox`/`AppendSphere`/
+  etc. `CallFunction:` nodes onto it -> `SetDynamicMesh()` on a `UDynamicMeshComponent` added
+  via the already-proven `vail_component_add`.
+- Apply the seeding process before writing any code: finish locating the "create mesh"
+  helper and the exact primitive-options struct shape first, then batch, then verify via
+  `vail_plugin_version` -- same discipline as everything else in this doc.
+
 **Practical implication for the build:**
 - Gameplay-time enemy spawning must be done via Blueprint graph nodes (a `SpawnActorFromClass`
-  K2 node via `vail_graph_add_node`), **not** `vail_level_spawn_actor` — that tool is
+  K2 node via `vail_graph_add_node` — confirmed working now that the generic fallback routes
+  through `UBlueprintNodeSpawner`), **not** `vail_level_spawn_actor` — that tool is
   editor-time-only placement, it has no meaning at runtime.
 - No landscape/foliage — use a flat/simple ground plane (a scaled `StaticMeshActor` cube or
   plane works fine for a top-down arena).

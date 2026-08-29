@@ -49,7 +49,9 @@ public class VAILCore : ModuleRules
 				"AssetTools",
 				"MaterialEditor",
 				"UMG",
-				"UMGEditor"
+				"UMGEditor",
+				"EnhancedInput",
+				"InputBlueprintNodes"
 			}
 		);
 	}

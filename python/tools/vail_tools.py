@@ -202,17 +202,139 @@ def register_vail_tools(mcp):
             "graph_name": graph_name
         })
 
+    @mcp.tool()
+    def vail_graph_set_pin_default(pin_spec: str, value: str, asset_path: str = "", graph_name: str = "") -> Dict[str, Any]:
+        """Sets the literal default value on an unconnected graph pin (e.g. a CallFunction node's unwired input).
+
+        Args:
+            pin_spec: Pin in 'NodeId:PinName' format.
+            value: Formatted literal value (e.g. '(X=1.0,Y=0.0,Z=0.0)', 'true', '5.0').
+            asset_path: Optional asset path.
+            graph_name: Optional graph name.
+        """
+        conn = get_unreal_connection()
+        if not conn:
+            return {"status": "error", "error": "Not connected to Unreal Engine"}
+        return conn.send_command("vail_graph_set_pin_default", {
+            "pin_spec": pin_spec,
+            "value": value,
+            "asset_path": asset_path,
+            "graph_name": graph_name
+        })
+
     # =========================================================================
     # Phase 2: Content Browser Asset Management
     # =========================================================================
 
     @mcp.tool()
+    def vail_component_add(asset_path: str, component_class: str, component_name: str = "", parent_component: str = "", attach_socket: str = "") -> Dict[str, Any]:
+        """Headlessly add a component to a Blueprint's Components tree (Simple Construction Script).
+
+        No Blueprint editor window needs to be open. Works for native-inherited parents too
+        (e.g. attaching a SpringArm under a Character's inherited CapsuleComponent root).
+
+        Args:
+            asset_path: Target Blueprint asset path (e.g. '/Game/Blueprints/BP_Player').
+            component_class: Component class, short or full name (e.g. 'SpringArmComponent', 'Camera', 'UStaticMeshComponent').
+            component_name: Optional variable name for the new component; auto-generated if omitted.
+            parent_component: Optional name of an existing component (SCS node or inherited native) to attach under; empty attaches to the Blueprint's root.
+            attach_socket: Optional socket/bone name on the parent to attach at (e.g. a SpringArm's 'SpringEndpoint' socket for its Camera child) -- without this the child attaches at the parent's origin, not its visual endpoint.
+        """
+        conn = get_unreal_connection()
+        if not conn:
+            return {"status": "error", "error": "Not connected to Unreal Engine"}
+        return conn.send_command("vail_component_add", {
+            "asset_path": asset_path,
+            "component_class": component_class,
+            "component_name": component_name,
+            "parent_component": parent_component,
+            "attach_socket": attach_socket
+        })
+
+    @mcp.tool()
+    def vail_component_remove(asset_path: str, component_name: str) -> Dict[str, Any]:
+        """Headlessly remove a component from a Blueprint's Components tree (Simple Construction Script).
+
+        Args:
+            asset_path: Target Blueprint asset path (e.g. '/Game/Blueprints/BP_Player').
+            component_name: Variable name of the component to remove.
+        """
+        conn = get_unreal_connection()
+        if not conn:
+            return {"status": "error", "error": "Not connected to Unreal Engine"}
+        return conn.send_command("vail_component_remove", {
+            "asset_path": asset_path,
+            "component_name": component_name
+        })
+
+    @mcp.tool()
+    def vail_input_map_key(context_asset_path: str, action_asset_path: str, key_name: str, modifiers: Optional[list] = None) -> Dict[str, Any]:
+        """Maps a key to an Input Action on an Input Mapping Context, headlessly.
+
+        Args:
+            context_asset_path: Path to the InputMappingContext asset.
+            action_asset_path: Path to the InputAction asset.
+            key_name: Key name (e.g. 'W', 'A', 'S', 'D', 'SpaceBar', 'Gamepad_LeftX').
+            modifiers: Optional list of modifier names to apply, in order. Supported: 'Negate', 'SwizzleYXZ' (swaps X/Y -- e.g. binds a 1D key to a 2D action's Y axis, the standard trick for mapping W/S onto forward/back of a 2D move action).
+        """
+        conn = get_unreal_connection()
+        if not conn:
+            return {"status": "error", "error": "Not connected to Unreal Engine"}
+        return conn.send_command("vail_input_map_key", {
+            "context_asset_path": context_asset_path,
+            "action_asset_path": action_asset_path,
+            "key_name": key_name,
+            "modifiers": modifiers or []
+        })
+
+    @mcp.tool()
+    def vail_variable_add(asset_path: str, var_name: str, var_type: str, default_value: str = "") -> Dict[str, Any]:
+        """Adds a member variable to a Blueprint, headlessly.
+
+        Args:
+            asset_path: Target Blueprint asset path.
+            var_name: Name of the new variable.
+            var_type: One of 'Float', 'Int', 'Bool', 'String', 'Vector'.
+            default_value: Optional default value as a formatted string.
+        """
+        conn = get_unreal_connection()
+        if not conn:
+            return {"status": "error", "error": "Not connected to Unreal Engine"}
+        return conn.send_command("vail_variable_add", {
+            "asset_path": asset_path,
+            "var_name": var_name,
+            "var_type": var_type,
+            "default_value": default_value
+        })
+
+    @mcp.tool()
+    def vail_trigger_live_coding() -> Dict[str, Any]:
+        """Triggers a Live Coding compile programmatically -- the same effect as pressing
+        Ctrl+Alt+F11 in the editor, but callable headlessly. Async: returns immediately once
+        the compile starts. Poll vail_plugin_version (or call this again, which reports
+        'already in progress' until done) to know when it's finished."""
+        conn = get_unreal_connection()
+        if not conn:
+            return {"status": "error", "error": "Not connected to Unreal Engine"}
+        return conn.send_command("vail_trigger_live_coding", {})
+
+    @mcp.tool()
+    def vail_plugin_version() -> Dict[str, Any]:
+        """Returns the currently-running plugin's version string, bumped on every plugin
+        change. Call this after any editor restart or Live Coding attempt to confirm the
+        new code is actually running, instead of guessing from DLL/source timestamps."""
+        conn = get_unreal_connection()
+        if not conn:
+            return {"status": "error", "error": "Not connected to Unreal Engine"}
+        return conn.send_command("vail_plugin_version", {})
+
+    @mcp.tool()
     def vail_asset_create(asset_path: str, asset_class: str, parent_class: str = "") -> Dict[str, Any]:
         """Headless creation of new assets in the Content Browser.
-        
+
         Args:
             asset_path: Target asset path (e.g. '/Game/Materials/M_HeroShader', '/Game/Blueprints/BP_Enemy').
-            asset_class: Class of asset ('Blueprint', 'Material', 'MaterialInstanceConstant').
+            asset_class: Class of asset ('Blueprint', 'Material', 'MaterialInstanceConstant', 'InputAction', 'InputMappingContext').
             parent_class: For Blueprints: parent class (e.g. 'Actor', 'Character', 'Pawn').
         """
         conn = get_unreal_connection()

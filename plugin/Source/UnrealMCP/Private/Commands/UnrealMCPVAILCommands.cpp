@@ -40,6 +40,7 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "K2Node_ComponentBoundEvent.h"
 #include "Sound/SoundBase.h"
+#include "ILiveCodingModule.h"
 
 FUnrealMCPVAILCommands::FUnrealMCPVAILCommands()
 {
@@ -100,6 +101,10 @@ TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleCommand(const FString& Com
 	{
 		return HandleGraphDeleteNode(Params);
 	}
+	else if (CommandType == TEXT("vail_graph_set_pin_default"))
+	{
+		return HandleGraphSetPinDefault(Params);
+	}
 	// Phase 2: Asset Management
 	else if (CommandType == TEXT("vail_asset_create"))
 	{
@@ -112,6 +117,30 @@ TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleCommand(const FString& Com
 	else if (CommandType == TEXT("vail_asset_save"))
 	{
 		return HandleAssetSave(Params);
+	}
+	else if (CommandType == TEXT("vail_component_add"))
+	{
+		return HandleComponentAdd(Params);
+	}
+	else if (CommandType == TEXT("vail_component_remove"))
+	{
+		return HandleComponentRemove(Params);
+	}
+	else if (CommandType == TEXT("vail_input_map_key"))
+	{
+		return HandleInputMapKey(Params);
+	}
+	else if (CommandType == TEXT("vail_variable_add"))
+	{
+		return HandleVariableAdd(Params);
+	}
+	else if (CommandType == TEXT("vail_plugin_version"))
+	{
+		return HandlePluginVersion(Params);
+	}
+	else if (CommandType == TEXT("vail_trigger_live_coding"))
+	{
+		return HandleTriggerLiveCoding(Params);
 	}
 	// Phase 3: Spatial, UMG, Sequencer, and Sensory Telemetry
 	else if (CommandType == TEXT("vail_level_spawn_actor"))
@@ -888,6 +917,70 @@ TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleGraphDeleteNode(const TSha
 	return ResultJson;
 }
 
+TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleGraphSetPinDefault(const TSharedPtr<FJsonObject>& Params)
+{
+	TSharedPtr<FJsonObject> ResultJson = MakeShareable(new FJsonObject);
+
+	FString AssetPath, GraphName, PinSpec, Value;
+	if (Params.IsValid())
+	{
+		Params->TryGetStringField(TEXT("asset_path"), AssetPath);
+		Params->TryGetStringField(TEXT("graph_name"), GraphName);
+		Params->TryGetStringField(TEXT("pin_spec"), PinSpec);
+		Params->TryGetStringField(TEXT("value"), Value);
+	}
+
+	UObject* TargetObject = nullptr;
+	if (!AssetPath.IsEmpty())
+	{
+		TargetObject = LoadObject<UObject>(nullptr, *AssetPath);
+	}
+	else
+	{
+		TargetObject = FVAILSessionManager::Get().GetScopedObject();
+	}
+
+	if (!TargetObject)
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), TEXT("Target asset not found."));
+		return ResultJson;
+	}
+
+	const bool bInBatch = FVAILSessionManager::Get().IsInBatch();
+	if (!bInBatch && GEditor)
+	{
+		GEditor->BeginTransaction(FText::FromString(FString::Printf(TEXT("VAIL: Set Pin Default %s"), *PinSpec)));
+	}
+
+	FString ErrorMessage;
+	if (!FVAILGraphInspector::Get().SetPinDefaultValue(TargetObject, GraphName, PinSpec, Value, ErrorMessage))
+	{
+		if (!bInBatch && GEditor)
+		{
+			GEditor->UndoTransaction();
+		}
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), ErrorMessage);
+		return ResultJson;
+	}
+
+	if (!bInBatch && GEditor)
+	{
+		GEditor->EndTransaction();
+	}
+
+	FVAILSettleResult Settle = FVAILSettleEngine::Get().WaitForSettle(2.0f, 2, Cast<UBlueprint>(TargetObject));
+
+	ResultJson->SetBoolField(TEXT("success"), true);
+	ResultJson->SetStringField(TEXT("pin_spec"), PinSpec);
+	ResultJson->SetStringField(TEXT("value"), Value);
+	ResultJson->SetBoolField(TEXT("settled"), Settle.bSettled);
+	ResultJson->SetNumberField(TEXT("settle_ms"), Settle.SettleDurationMs);
+
+	return ResultJson;
+}
+
 TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleAssetCreate(const TSharedPtr<FJsonObject>& Params)
 {
 	TSharedPtr<FJsonObject> ResultJson = MakeShareable(new FJsonObject);
@@ -940,6 +1033,228 @@ TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleAssetCreate(const TSharedP
 	ResultJson->SetBoolField(TEXT("settled"), Settle.bSettled);
 	ResultJson->SetNumberField(TEXT("settle_ms"), Settle.SettleDurationMs);
 
+	return ResultJson;
+}
+
+TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleComponentAdd(const TSharedPtr<FJsonObject>& Params)
+{
+	TSharedPtr<FJsonObject> ResultJson = MakeShareable(new FJsonObject);
+
+	FString AssetPath, ComponentClass, ComponentName, ParentComponentName, AttachSocket;
+	if (Params.IsValid())
+	{
+		Params->TryGetStringField(TEXT("asset_path"), AssetPath);
+		Params->TryGetStringField(TEXT("component_class"), ComponentClass);
+		Params->TryGetStringField(TEXT("component_name"), ComponentName);
+		Params->TryGetStringField(TEXT("parent_component"), ParentComponentName);
+		Params->TryGetStringField(TEXT("attach_socket"), AttachSocket);
+	}
+
+	if (AssetPath.IsEmpty() || ComponentClass.IsEmpty())
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), TEXT("'asset_path' and 'component_class' are required parameters"));
+		return ResultJson;
+	}
+
+	const bool bInBatch = FVAILSessionManager::Get().IsInBatch();
+	if (!bInBatch && GEditor)
+	{
+		GEditor->BeginTransaction(FText::FromString(FString::Printf(TEXT("VAIL: Add Component %s to %s"), *ComponentClass, *AssetPath)));
+	}
+
+	FString CreatedComponentName;
+	FString ErrorMessage;
+	if (!FVAILAssetManager::Get().AddComponent(AssetPath, ComponentClass, ComponentName, ParentComponentName, AttachSocket, CreatedComponentName, ErrorMessage))
+	{
+		if (!bInBatch && GEditor)
+		{
+			GEditor->UndoTransaction();
+		}
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), ErrorMessage);
+		return ResultJson;
+	}
+
+	if (!bInBatch && GEditor)
+	{
+		GEditor->EndTransaction();
+	}
+
+	UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *AssetPath);
+	FVAILSettleResult Settle = FVAILSettleEngine::Get().WaitForSettle(2.0f, 2, Blueprint);
+
+	ResultJson->SetBoolField(TEXT("success"), true);
+	ResultJson->SetStringField(TEXT("asset_path"), AssetPath);
+	ResultJson->SetStringField(TEXT("component_class"), ComponentClass);
+	ResultJson->SetStringField(TEXT("component_name"), CreatedComponentName);
+	ResultJson->SetStringField(TEXT("parent_component"), ParentComponentName);
+	ResultJson->SetBoolField(TEXT("settled"), Settle.bSettled);
+	ResultJson->SetNumberField(TEXT("settle_ms"), Settle.SettleDurationMs);
+
+	return ResultJson;
+}
+
+TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleComponentRemove(const TSharedPtr<FJsonObject>& Params)
+{
+	TSharedPtr<FJsonObject> ResultJson = MakeShareable(new FJsonObject);
+
+	FString AssetPath, ComponentName;
+	if (Params.IsValid())
+	{
+		Params->TryGetStringField(TEXT("asset_path"), AssetPath);
+		Params->TryGetStringField(TEXT("component_name"), ComponentName);
+	}
+
+	if (AssetPath.IsEmpty() || ComponentName.IsEmpty())
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), TEXT("'asset_path' and 'component_name' are required parameters"));
+		return ResultJson;
+	}
+
+	FString ErrorMessage;
+	if (!FVAILAssetManager::Get().RemoveComponent(AssetPath, ComponentName, ErrorMessage))
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), ErrorMessage);
+		return ResultJson;
+	}
+
+	ResultJson->SetBoolField(TEXT("success"), true);
+	ResultJson->SetStringField(TEXT("asset_path"), AssetPath);
+	ResultJson->SetStringField(TEXT("component_name"), ComponentName);
+	return ResultJson;
+}
+
+TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleInputMapKey(const TSharedPtr<FJsonObject>& Params)
+{
+	TSharedPtr<FJsonObject> ResultJson = MakeShareable(new FJsonObject);
+
+	FString ContextAssetPath, ActionAssetPath, KeyName;
+	TArray<FString> Modifiers;
+	if (Params.IsValid())
+	{
+		Params->TryGetStringField(TEXT("context_asset_path"), ContextAssetPath);
+		Params->TryGetStringField(TEXT("action_asset_path"), ActionAssetPath);
+		Params->TryGetStringField(TEXT("key_name"), KeyName);
+
+		const TArray<TSharedPtr<FJsonValue>>* ModifiersArray;
+		if (Params->TryGetArrayField(TEXT("modifiers"), ModifiersArray))
+		{
+			for (const TSharedPtr<FJsonValue>& Val : *ModifiersArray)
+			{
+				FString ModStr;
+				if (Val->TryGetString(ModStr))
+				{
+					Modifiers.Add(ModStr);
+				}
+			}
+		}
+	}
+
+	if (ContextAssetPath.IsEmpty() || ActionAssetPath.IsEmpty() || KeyName.IsEmpty())
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), TEXT("'context_asset_path', 'action_asset_path', and 'key_name' are required parameters"));
+		return ResultJson;
+	}
+
+	FString ErrorMessage;
+	if (!FVAILAssetManager::Get().AddInputKeyMapping(ContextAssetPath, ActionAssetPath, KeyName, Modifiers, ErrorMessage))
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), ErrorMessage);
+		return ResultJson;
+	}
+
+	ResultJson->SetBoolField(TEXT("success"), true);
+	ResultJson->SetStringField(TEXT("context_asset_path"), ContextAssetPath);
+	ResultJson->SetStringField(TEXT("action_asset_path"), ActionAssetPath);
+	ResultJson->SetStringField(TEXT("key_name"), KeyName);
+	return ResultJson;
+}
+
+TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleVariableAdd(const TSharedPtr<FJsonObject>& Params)
+{
+	TSharedPtr<FJsonObject> ResultJson = MakeShareable(new FJsonObject);
+
+	FString AssetPath, VarName, VarType, DefaultValue;
+	if (Params.IsValid())
+	{
+		Params->TryGetStringField(TEXT("asset_path"), AssetPath);
+		Params->TryGetStringField(TEXT("var_name"), VarName);
+		Params->TryGetStringField(TEXT("var_type"), VarType);
+		Params->TryGetStringField(TEXT("default_value"), DefaultValue);
+	}
+
+	if (AssetPath.IsEmpty() || VarName.IsEmpty() || VarType.IsEmpty())
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), TEXT("'asset_path', 'var_name', and 'var_type' are required parameters"));
+		return ResultJson;
+	}
+
+	FString ErrorMessage;
+	if (!FVAILAssetManager::Get().AddVariable(AssetPath, VarName, VarType, DefaultValue, ErrorMessage))
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), ErrorMessage);
+		return ResultJson;
+	}
+
+	ResultJson->SetBoolField(TEXT("success"), true);
+	ResultJson->SetStringField(TEXT("asset_path"), AssetPath);
+	ResultJson->SetStringField(TEXT("var_name"), VarName);
+	ResultJson->SetStringField(TEXT("var_type"), VarType);
+	return ResultJson;
+}
+
+TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandlePluginVersion(const TSharedPtr<FJsonObject>& Params)
+{
+	TSharedPtr<FJsonObject> ResultJson = MakeShareable(new FJsonObject);
+	ResultJson->SetBoolField(TEXT("success"), true);
+	// Bump this string on every plugin change -- lets a caller confirm after a restart or
+	// Live Coding attempt that new code is actually running, without guessing from DLL
+	// timestamps (a restart can silently keep a stale DLL).
+	ResultJson->SetStringField(TEXT("version"), TEXT("2026-08-29-08-find-nearest-actor"));
+	return ResultJson;
+}
+
+TSharedPtr<FJsonObject> FUnrealMCPVAILCommands::HandleTriggerLiveCoding(const TSharedPtr<FJsonObject>& Params)
+{
+	TSharedPtr<FJsonObject> ResultJson = MakeShareable(new FJsonObject);
+
+	if (!FModuleManager::Get().IsModuleLoaded(TEXT("LiveCoding")))
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), TEXT("LiveCoding module is not loaded"));
+		return ResultJson;
+	}
+
+	ILiveCodingModule& LiveCoding = FModuleManager::GetModuleChecked<ILiveCodingModule>(TEXT("LiveCoding"));
+
+	if (!LiveCoding.IsEnabledForSession())
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), TEXT("Live Coding is not enabled for this session"));
+		return ResultJson;
+	}
+
+	if (LiveCoding.IsCompiling())
+	{
+		ResultJson->SetBoolField(TEXT("success"), false);
+		ResultJson->SetStringField(TEXT("error"), TEXT("A Live Coding compile is already in progress"));
+		return ResultJson;
+	}
+
+	// Fire-and-forget: Compile() is async, same as pressing Ctrl+Alt+F11. Caller should poll
+	// vail_plugin_version (or vail_trigger_live_coding again, which will report "already in
+	// progress" until done) rather than block here.
+	LiveCoding.Compile();
+
+	ResultJson->SetBoolField(TEXT("success"), true);
+	ResultJson->SetStringField(TEXT("status"), TEXT("Live Coding compile triggered"));
 	return ResultJson;
 }
 

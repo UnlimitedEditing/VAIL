@@ -17,6 +17,16 @@
 #include "WidgetBlueprintFactory.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
+#include "Engine/SCS_Node.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
+#include "Kismet2/BlueprintEditorUtils.h"
+#include "InputAction.h"
+#include "InputMappingContext.h"
+#include "InputModifiers.h"
+#include "InputCoreTypes.h"
+#include "EdGraphSchema_K2.h"
 
 FVAILAssetManager& FVAILAssetManager::Get()
 {
@@ -196,6 +206,39 @@ bool FVAILAssetManager::CreateAsset(
 		return true;
 	}
 
+	// 5. Create Input Action / Input Mapping Context -- plain UObject-derived data assets
+	// with no dedicated public UFactory, so they're created directly via NewObject + the
+	// same AssetRegistry/package registration every UFactory does under the hood.
+	if (AssetClass.Equals(TEXT("InputAction"), ESearchCase::IgnoreCase))
+	{
+		UPackage* Package = CreatePackage(*(PackageName / AssetName));
+		UInputAction* NewAction = NewObject<UInputAction>(Package, FName(*AssetName), RF_Public | RF_Standalone);
+		if (!NewAction)
+		{
+			ErrorMessage = FString::Printf(TEXT("Failed to create InputAction at '%s/%s'"), *PackageName, *AssetName);
+			return false;
+		}
+		FAssetRegistryModule::AssetCreated(NewAction);
+		NewAction->MarkPackageDirty();
+		OutAsset = NewAction;
+		return true;
+	}
+
+	if (AssetClass.Equals(TEXT("InputMappingContext"), ESearchCase::IgnoreCase))
+	{
+		UPackage* Package = CreatePackage(*(PackageName / AssetName));
+		UInputMappingContext* NewContext = NewObject<UInputMappingContext>(Package, FName(*AssetName), RF_Public | RF_Standalone);
+		if (!NewContext)
+		{
+			ErrorMessage = FString::Printf(TEXT("Failed to create InputMappingContext at '%s/%s'"), *PackageName, *AssetName);
+			return false;
+		}
+		FAssetRegistryModule::AssetCreated(NewContext);
+		NewContext->MarkPackageDirty();
+		OutAsset = NewContext;
+		return true;
+	}
+
 	ErrorMessage = FString::Printf(TEXT("Asset class '%s' is not supported for automated creation"), *AssetClass);
 	return false;
 }
@@ -309,5 +352,266 @@ bool FVAILAssetManager::SaveAsset(
 		return false;
 	}
 
+	return true;
+}
+
+bool FVAILAssetManager::AddComponent(
+	const FString& AssetPath,
+	const FString& ComponentClass,
+	const FString& ComponentName,
+	const FString& ParentComponentName,
+	const FString& AttachSocket,
+	FString& OutCreatedComponentName,
+	FString& ErrorMessage)
+{
+	UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *AssetPath);
+	if (!Blueprint)
+	{
+		ErrorMessage = FString::Printf(TEXT("Could not load Blueprint at '%s'"), *AssetPath);
+		return false;
+	}
+
+	if (!Blueprint->SimpleConstructionScript)
+	{
+		ErrorMessage = FString::Printf(TEXT("Blueprint '%s' has no SimpleConstructionScript (not an Actor-based Blueprint?)"), *AssetPath);
+		return false;
+	}
+
+	// Resolve the component class by short name ("SpringArmComponent", "Camera") or full
+	// engine name ("USpringArmComponent") -- mirrors the parent-class resolution in CreateAsset.
+	UClass* CompClass = nullptr;
+	if (!ComponentClass.IsEmpty())
+	{
+		for (TObjectIterator<UClass> It; It; ++It)
+		{
+			if (!It->IsChildOf(UActorComponent::StaticClass()))
+			{
+				continue;
+			}
+			const FString ClassName = It->GetName();
+			if (ClassName.Equals(ComponentClass, ESearchCase::IgnoreCase) ||
+				ClassName.Equals(TEXT("U") + ComponentClass, ESearchCase::IgnoreCase) ||
+				ClassName.Equals(ComponentClass + TEXT("Component"), ESearchCase::IgnoreCase) ||
+				ClassName.Equals(TEXT("U") + ComponentClass + TEXT("Component"), ESearchCase::IgnoreCase))
+			{
+				CompClass = *It;
+				break;
+			}
+		}
+	}
+
+	if (!CompClass)
+	{
+		ErrorMessage = FString::Printf(TEXT("Could not resolve component class '%s'"), *ComponentClass);
+		return false;
+	}
+
+	USimpleConstructionScript* SCS = Blueprint->SimpleConstructionScript;
+
+	FName DesiredName = ComponentName.IsEmpty() ? FName(*CompClass->GetName()) : FName(*ComponentName);
+	DesiredName = FBlueprintEditorUtils::FindUniqueKismetName(Blueprint, DesiredName.ToString());
+
+	USCS_Node* NewNode = SCS->CreateNode(CompClass, DesiredName);
+	if (!NewNode)
+	{
+		ErrorMessage = FString::Printf(TEXT("Failed to create component node '%s' of class '%s'"), *DesiredName.ToString(), *ComponentClass);
+		return false;
+	}
+
+	if (!AttachSocket.IsEmpty())
+	{
+		// e.g. attaching a Camera to a SpringArm must target the arm's "SpringEndpoint"
+		// socket, not its origin, or the camera ends up sitting at the pawn's pivot.
+		NewNode->AttachToName = FName(*AttachSocket);
+	}
+
+	bool bAttached = false;
+	if (!ParentComponentName.IsEmpty())
+	{
+		// First try an existing node already in this Blueprint's own SCS tree.
+		for (USCS_Node* Node : SCS->GetAllNodes())
+		{
+			if (Node->GetVariableName().ToString().Equals(ParentComponentName, ESearchCase::IgnoreCase))
+			{
+				Node->AddChildNode(NewNode);
+				bAttached = true;
+				break;
+			}
+		}
+
+		// Fall back to attaching under an inherited native component (e.g. Character's
+		// CapsuleComponent root, which lives on the C++ parent class, not in this SCS).
+		// USCS_Node has no SetParent(name, class) overload -- an inherited-native parent is
+		// recorded directly on these fields instead (mirrors what FKismetEditorUtilities'
+		// internal AddNewComponent flow does for the "attach to inherited component" case).
+		if (!bAttached)
+		{
+			NewNode->ParentComponentOrVariableName = FName(*ParentComponentName);
+			NewNode->bIsParentComponentNative = true;
+			SCS->AddNode(NewNode);
+			bAttached = true;
+		}
+	}
+	else
+	{
+		// No explicit parent: attach under the Blueprint's existing root (native or SCS) so
+		// the new component follows the actor instead of floating as a disconnected root.
+		if (USCS_Node* RootNode = SCS->GetDefaultSceneRootNode())
+		{
+			if (CompClass->IsChildOf(USceneComponent::StaticClass()))
+			{
+				RootNode->AddChildNode(NewNode);
+			}
+			else
+			{
+				SCS->AddNode(NewNode);
+			}
+		}
+		else
+		{
+			SCS->AddNode(NewNode);
+		}
+		bAttached = true;
+	}
+
+	FKismetEditorUtilities::CompileBlueprint(Blueprint);
+	Blueprint->MarkPackageDirty();
+
+	OutCreatedComponentName = NewNode->GetVariableName().ToString();
+	return true;
+}
+
+bool FVAILAssetManager::RemoveComponent(
+	const FString& AssetPath,
+	const FString& ComponentName,
+	FString& ErrorMessage)
+{
+	UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *AssetPath);
+	if (!Blueprint || !Blueprint->SimpleConstructionScript)
+	{
+		ErrorMessage = FString::Printf(TEXT("Could not load Blueprint (or its SCS) at '%s'"), *AssetPath);
+		return false;
+	}
+
+	USimpleConstructionScript* SCS = Blueprint->SimpleConstructionScript;
+	for (USCS_Node* Node : SCS->GetAllNodes())
+	{
+		if (Node->GetVariableName().ToString().Equals(ComponentName, ESearchCase::IgnoreCase))
+		{
+			SCS->RemoveNode(Node);
+			FKismetEditorUtilities::CompileBlueprint(Blueprint);
+			Blueprint->MarkPackageDirty();
+			return true;
+		}
+	}
+
+	ErrorMessage = FString::Printf(TEXT("No SCS component named '%s' found on '%s'"), *ComponentName, *AssetPath);
+	return false;
+}
+
+bool FVAILAssetManager::AddInputKeyMapping(
+	const FString& ContextAssetPath,
+	const FString& ActionAssetPath,
+	const FString& KeyName,
+	const TArray<FString>& Modifiers,
+	FString& ErrorMessage)
+{
+	UInputMappingContext* Context = LoadObject<UInputMappingContext>(nullptr, *ContextAssetPath);
+	if (!Context)
+	{
+		ErrorMessage = FString::Printf(TEXT("Could not load InputMappingContext at '%s'"), *ContextAssetPath);
+		return false;
+	}
+
+	UInputAction* Action = LoadObject<UInputAction>(nullptr, *ActionAssetPath);
+	if (!Action)
+	{
+		ErrorMessage = FString::Printf(TEXT("Could not load InputAction at '%s'"), *ActionAssetPath);
+		return false;
+	}
+
+	const FKey Key = FName(*KeyName);
+	if (!Key.IsValid())
+	{
+		ErrorMessage = FString::Printf(TEXT("'%s' is not a recognized key name"), *KeyName);
+		return false;
+	}
+
+	Context->Modify();
+	FEnhancedActionKeyMapping& Mapping = Context->MapKey(Action, Key);
+
+	for (const FString& ModifierName : Modifiers)
+	{
+		UInputModifier* NewModifier = nullptr;
+		if (ModifierName.Equals(TEXT("Negate"), ESearchCase::IgnoreCase))
+		{
+			NewModifier = NewObject<UInputModifierNegate>(Context);
+		}
+		else if (ModifierName.Equals(TEXT("SwizzleYXZ"), ESearchCase::IgnoreCase) || ModifierName.Equals(TEXT("Swizzle"), ESearchCase::IgnoreCase))
+		{
+			NewModifier = NewObject<UInputModifierSwizzleAxis>(Context);
+		}
+		else
+		{
+			ErrorMessage = FString::Printf(TEXT("Unrecognized modifier '%s' (supported: Negate, SwizzleYXZ)"), *ModifierName);
+			return false;
+		}
+		Mapping.Modifiers.Add(NewModifier);
+	}
+
+	Context->MarkPackageDirty();
+	return true;
+}
+
+bool FVAILAssetManager::AddVariable(
+	const FString& AssetPath,
+	const FString& VarName,
+	const FString& VarType,
+	const FString& DefaultValue,
+	FString& ErrorMessage)
+{
+	UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *AssetPath);
+	if (!Blueprint)
+	{
+		ErrorMessage = FString::Printf(TEXT("Could not load Blueprint at '%s'"), *AssetPath);
+		return false;
+	}
+
+	FEdGraphPinType PinType;
+	if (VarType.Equals(TEXT("Float"), ESearchCase::IgnoreCase))
+	{
+		PinType.PinCategory = UEdGraphSchema_K2::PC_Real;
+		PinType.PinSubCategory = UEdGraphSchema_K2::PC_Double;
+	}
+	else if (VarType.Equals(TEXT("Int"), ESearchCase::IgnoreCase) || VarType.Equals(TEXT("Integer"), ESearchCase::IgnoreCase))
+	{
+		PinType.PinCategory = UEdGraphSchema_K2::PC_Int;
+	}
+	else if (VarType.Equals(TEXT("Bool"), ESearchCase::IgnoreCase) || VarType.Equals(TEXT("Boolean"), ESearchCase::IgnoreCase))
+	{
+		PinType.PinCategory = UEdGraphSchema_K2::PC_Boolean;
+	}
+	else if (VarType.Equals(TEXT("String"), ESearchCase::IgnoreCase))
+	{
+		PinType.PinCategory = UEdGraphSchema_K2::PC_String;
+	}
+	else if (VarType.Equals(TEXT("Vector"), ESearchCase::IgnoreCase))
+	{
+		PinType.PinCategory = UEdGraphSchema_K2::PC_Struct;
+		PinType.PinSubCategoryObject = TBaseStructure<FVector>::Get();
+	}
+	else
+	{
+		ErrorMessage = FString::Printf(TEXT("Unsupported variable type '%s' (supported: Float, Int, Bool, String, Vector)"), *VarType);
+		return false;
+	}
+
+	if (!FBlueprintEditorUtils::AddMemberVariable(Blueprint, FName(*VarName), PinType, DefaultValue))
+	{
+		ErrorMessage = FString::Printf(TEXT("Failed to add variable '%s' to '%s'"), *VarName, *AssetPath);
+		return false;
+	}
+
+	Blueprint->MarkPackageDirty();
 	return true;
 }

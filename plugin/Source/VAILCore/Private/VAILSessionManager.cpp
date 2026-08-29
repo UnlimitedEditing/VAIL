@@ -6,6 +6,11 @@
 #include "Engine/Selection.h"
 #include "EngineUtils.h"
 #include "HAL/PlatformTime.h"
+#include "Engine/Blueprint.h"
+#include "Engine/SCS_Node.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "GameFramework/Actor.h"
+#include "Components/ActorComponent.h"
 
 FVAILSessionManager& FVAILSessionManager::Get()
 {
@@ -177,6 +182,74 @@ UObject* FVAILSessionManager::ResolveObject(const FString& Identifier) const
 {
 	if (Identifier.IsEmpty())
 	{
+		return nullptr;
+	}
+
+	// 0. "<BlueprintAssetPath>::<ComponentVariableName>" addresses a component's default-value
+	// template inside a Blueprint's Components tree (SCS) -- lets vail_set_property configure
+	// a component (SpringArm length, Camera FOV, etc.) with no Blueprint editor window open.
+	FString BlueprintPath, ComponentName;
+	if (Identifier.Split(TEXT("::"), &BlueprintPath, &ComponentName))
+	{
+		if (UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *BlueprintPath))
+		{
+			// "::Self" (or "::CDO") addresses the Blueprint's own actor-level defaults --
+			// e.g. bUseControllerRotationYaw on a Character -- as opposed to any component.
+			if (ComponentName.Equals(TEXT("Self"), ESearchCase::IgnoreCase) ||
+				ComponentName.Equals(TEXT("CDO"), ESearchCase::IgnoreCase))
+			{
+				if (Blueprint->GeneratedClass)
+				{
+					return Blueprint->GeneratedClass->GetDefaultObject();
+				}
+				return nullptr;
+			}
+
+			if (Blueprint->SimpleConstructionScript)
+			{
+				for (USCS_Node* Node : Blueprint->SimpleConstructionScript->GetAllNodes())
+				{
+					if (Node->GetVariableName().ToString().Equals(ComponentName, ESearchCase::IgnoreCase))
+					{
+						return Node->ComponentTemplate;
+					}
+				}
+			}
+
+			// Not an SCS node -- fall back to a component inherited from the native C++ parent
+			// class (e.g. Character's CapsuleComponent/CharacterMovement/Mesh), read off the
+			// class default object so its property defaults are still editable headlessly.
+			if (Blueprint->GeneratedClass)
+			{
+				if (AActor* CDO = Cast<AActor>(Blueprint->GeneratedClass->GetDefaultObject()))
+				{
+					// Native default subobjects rarely carry the friendly name callers will
+					// guess (e.g. ACharacter's movement component object is "CharMoveComp",
+					// not "CharacterMovement") -- so match on object name first, then fall
+					// back to the component's class name, which is what users actually know.
+					UActorComponent* ClassNameMatch = nullptr;
+					for (UActorComponent* Comp : CDO->GetComponents())
+					{
+						if (!Comp)
+						{
+							continue;
+						}
+						if (Comp->GetName().Equals(ComponentName, ESearchCase::IgnoreCase))
+						{
+							return Comp;
+						}
+						if (!ClassNameMatch && Comp->GetClass()->GetName().Contains(ComponentName, ESearchCase::IgnoreCase))
+						{
+							ClassNameMatch = Comp;
+						}
+					}
+					if (ClassNameMatch)
+					{
+						return ClassNameMatch;
+					}
+				}
+			}
+		}
 		return nullptr;
 	}
 

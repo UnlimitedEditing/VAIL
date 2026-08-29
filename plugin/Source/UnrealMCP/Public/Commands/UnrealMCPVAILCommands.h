@@ -33,9 +33,16 @@ private:
 	TSharedPtr<FJsonObject> HandleGraphAddNode(const TSharedPtr<FJsonObject>& Params);
 	TSharedPtr<FJsonObject> HandleGraphConnectPins(const TSharedPtr<FJsonObject>& Params);
 	TSharedPtr<FJsonObject> HandleGraphDeleteNode(const TSharedPtr<FJsonObject>& Params);
+	TSharedPtr<FJsonObject> HandleGraphSetPinDefault(const TSharedPtr<FJsonObject>& Params);
 	TSharedPtr<FJsonObject> HandleAssetCreate(const TSharedPtr<FJsonObject>& Params);
 	TSharedPtr<FJsonObject> HandleAssetQuery(const TSharedPtr<FJsonObject>& Params);
 	TSharedPtr<FJsonObject> HandleAssetSave(const TSharedPtr<FJsonObject>& Params);
+	TSharedPtr<FJsonObject> HandleComponentAdd(const TSharedPtr<FJsonObject>& Params);
+	TSharedPtr<FJsonObject> HandleComponentRemove(const TSharedPtr<FJsonObject>& Params);
+	TSharedPtr<FJsonObject> HandleInputMapKey(const TSharedPtr<FJsonObject>& Params);
+	TSharedPtr<FJsonObject> HandleVariableAdd(const TSharedPtr<FJsonObject>& Params);
+	TSharedPtr<FJsonObject> HandlePluginVersion(const TSharedPtr<FJsonObject>& Params);
+	TSharedPtr<FJsonObject> HandleTriggerLiveCoding(const TSharedPtr<FJsonObject>& Params);
 
 	// Phase 3: Spatial, UMG, Sequencer, and Sensory Telemetry Handlers
 	TSharedPtr<FJsonObject> HandleLevelSpawnActor(const TSharedPtr<FJsonObject>& Params);

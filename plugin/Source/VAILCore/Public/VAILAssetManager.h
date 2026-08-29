@@ -55,6 +55,54 @@ public:
 		FString& ErrorMessage
 	);
 
+	/**
+	 * Adds a new component to a Blueprint's Simple Construction Script (its Components panel),
+	 * headlessly -- no Blueprint editor window needs to be open.
+	 */
+	bool AddComponent(
+		const FString& AssetPath, // Blueprint asset path, e.g. "/Game/Blueprints/BP_Player"
+		const FString& ComponentClass, // e.g. "SpringArmComponent", "CameraComponent", "StaticMeshComponent"
+		const FString& ComponentName, // Name to give the new component node
+		const FString& ParentComponentName, // Existing component to attach under; empty = attach to root
+		const FString& AttachSocket, // Optional socket/bone name on the parent to attach at (e.g. SpringArm's "SpringEndpoint"); empty = parent's origin
+		FString& OutCreatedComponentName,
+		FString& ErrorMessage
+	);
+
+	/**
+	 * Removes a component from a Blueprint's Simple Construction Script by variable name.
+	 */
+	bool RemoveComponent(
+		const FString& AssetPath,
+		const FString& ComponentName,
+		FString& ErrorMessage
+	);
+
+	/**
+	 * Maps a key to an Input Action on an Input Mapping Context, optionally applying named
+	 * modifiers (e.g. "SwizzleYXZ", "Negate") to combine multiple 1D key presses into a 2D
+	 * movement axis -- the same pattern the standard ThirdPerson template's IMC uses for WASD.
+	 */
+	bool AddInputKeyMapping(
+		const FString& ContextAssetPath,
+		const FString& ActionAssetPath,
+		const FString& KeyName,
+		const TArray<FString>& Modifiers,
+		FString& ErrorMessage
+	);
+
+	/**
+	 * Adds a member variable to a Blueprint. Supported VarType values: 'Float', 'Int',
+	 * 'Bool', 'String', 'Vector'.
+	 */
+	bool AddVariable(
+		const FString& AssetPath,
+		const FString& VarName,
+		const FString& VarType,
+		const FString& DefaultValue,
+		FString& ErrorMessage
+	);
+
 private:
 	FVAILAssetManager();
 	~FVAILAssetManager();
